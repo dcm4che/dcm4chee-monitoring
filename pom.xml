@@ -39,8 +39,8 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.dcm4che.dcm4chee-arc-monitoring</groupId>
-  <artifactId>dcm4chee-arc-monitoring-parent</artifactId>
+  <groupId>org.dcm4che.dcm4chee-monitoring</groupId>
+  <artifactId>dcm4chee-monitoring-parent</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
@@ -151,11 +151,11 @@
     </pluginManagement>
   </build>
   <modules>
-    <module>dcm4chee-arc-monitoring-api</module>
-    <module>dcm4chee-arc-monitoring-core</module>
-    <module>dcm4chee-arc-monitoring-jdbc</module>
-    <module>dcm4chee-arc-monitoring-rs</module>
-    <module>dcm4chee-arc-monitoring-provider</module>
+    <module>dcm4chee-monitoring-api</module>
+    <module>dcm4chee-monitoring-core</module>
+    <module>dcm4chee-monitoring-jdbc</module>
+    <module>dcm4chee-monitoring-rs</module>
+    <module>dcm4chee-monitoring-provider</module>
     <!--<module>dcm4chee-arc-monitoring-ear</module>-->
   </modules>
 </project>

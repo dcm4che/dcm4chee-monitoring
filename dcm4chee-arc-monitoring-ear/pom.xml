@@ -244,8 +244,8 @@
       <artifactId>dcm4chee-conf-cdi</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.dcm4che.dcm4chee-arc-monitoring</groupId>
-      <artifactId>dcm4chee-arc-monitoring-api</artifactId>
+      <groupId>org.dcm4che.dcm4chee-monitoring</groupId>
+      <artifactId>dcm4chee-monitoring-api</artifactId>
       <version>${monitoring-version}</version>
     </dependency>
   </dependencies>
@@ -276,25 +276,25 @@
       </activation>        
       <dependencies>
         <dependency>
-          <groupId>org.dcm4che.dcm4chee-arc-monitoring</groupId>
-          <artifactId>dcm4chee-arc-monitoring-provider</artifactId>
+          <groupId>org.dcm4che.dcm4chee-monitoring</groupId>
+          <artifactId>dcm4chee-monitoring-provider</artifactId>
           <version>${monitoring-version}</version>
           <type>ejb</type>
         </dependency>
         <dependency>
-          <groupId>org.dcm4che.dcm4chee-arc-monitoring</groupId>
-          <artifactId>dcm4chee-arc-monitoring-core</artifactId>
+          <groupId>org.dcm4che.dcm4chee-monitoring</groupId>
+          <artifactId>dcm4chee-monitoring-core</artifactId>
           <version>${monitoring-version}</version>
         </dependency>
         <dependency>
-          <groupId>org.dcm4che.dcm4chee-arc-monitoring</groupId>
-          <artifactId>dcm4chee-arc-monitoring-rs</artifactId>
+          <groupId>org.dcm4che.dcm4chee-monitoring</groupId>
+          <artifactId>dcm4chee-monitoring-rs</artifactId>
           <version>${monitoring-version}</version>
           <type>war</type>
         </dependency>
         <dependency>
-          <groupId>org.dcm4che.dcm4chee-arc-monitoring</groupId>
-          <artifactId>dcm4chee-arc-monitoring-jdbc</artifactId>
+          <groupId>org.dcm4che.dcm4chee-monitoring</groupId>
+          <artifactId>dcm4chee-monitoring-jdbc</artifactId>
           <version>${monitoring-version}</version>
         </dependency>
       </dependencies>
@@ -305,8 +305,8 @@
             <configuration>
               <modules>
                 <webModule>
-                  <groupId>org.dcm4che.dcm4chee-arc-monitoring</groupId>
-                  <artifactId>dcm4chee-arc-monitoring-rs</artifactId>
+                  <groupId>org.dcm4che.dcm4chee-monitoring</groupId>
+                  <artifactId>dcm4chee-monitoring-rs</artifactId>
                   <contextRoot>monitoring-service</contextRoot>
                 </webModule>
               </modules>

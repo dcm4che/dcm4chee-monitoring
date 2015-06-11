@@ -2,19 +2,19 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.dcm4che.dcm4chee-arc-monitoring</groupId>
-    <artifactId>dcm4chee-arc-monitoring-parent</artifactId>
+    <groupId>org.dcm4che.dcm4chee-monitoring</groupId>
+    <artifactId>dcm4chee-monitoring-parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>dcm4chee-arc-monitoring-jdbc</artifactId>
+  <artifactId>dcm4chee-monitoring-jdbc</artifactId>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.dcm4che.dcm4chee-arc-monitoring</groupId>
-      <artifactId>dcm4chee-arc-monitoring-core</artifactId>
+      <groupId>org.dcm4che.dcm4chee-monitoring</groupId>
+      <artifactId>dcm4chee-monitoring-core</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
