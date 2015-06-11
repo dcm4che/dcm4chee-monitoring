@@ -1,0 +1,15 @@
+{
+  "registryConfiguration" : {
+    "consumedMetricTimeout" : 5000,
+    "metricCleanupDaemonRunPeriod" : 6000
+  },
+  "startupConfiguration" : {
+    "metrics" : [ {
+      "contextPath" : [ "db", "connection" ],
+      "type" : "SumAggregate"
+    }, {
+      "contextPath" : [ "db", "connection" ],
+      "type" : "SumAggregate"
+    } ]
+  }
+}

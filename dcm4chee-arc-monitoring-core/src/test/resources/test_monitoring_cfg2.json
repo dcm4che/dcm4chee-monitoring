@@ -1,0 +1,46 @@
+{
+  "registryConfiguration" : {
+    "consumedMetricTimeout" : 5000,
+    "metricCleanupDaemonRunPeriod" : 5000
+  },
+  "startupConfiguration" : {
+    "metrics" : [ {
+      "contextPath" : [ "db", "connection" ],
+      "type" : "SumAggregate"
+    }]
+  },
+  "ruleConfiguration" : {
+    "forwardRules" : [ {
+      "sourcePattern" : [ "**", "connection", "*", "statement", "*" ],
+      "targetTemplates" : [ [ "$node", "db", "connection" ] ]
+    } ]
+  },
+  "metricReservoirConfigurations" : [ {
+    "name" : "DEFAULT",
+    "type" : "ROUND_ROBIN",
+    "resolutionStepSize" : 60000,
+    "resolutions" : [ 60000, 120000 ],
+    "valueReservoirs" : ["true","false"],
+    "retentions" : [ 2, 2 ],
+    "start" : "CURRENT_MIN"
+  }, {
+    "name" : "ONE_SHOT",
+    "type" : "OPEN_RESOLUTION"
+  }, {
+    "name" : "ONE_SEC_RESOLUTION__5_SEC_HISTORY",
+    "type" : "ROUND_ROBIN",
+    "resolutionStepSize" : 1000,
+    "resolutions" : [ 1000],
+    "valueReservoirs" : ["false"],
+    "retentions" : [ 5 ],
+    "start" : "CURRENT_SEC"
+  },{
+    "name" : "OPEN_RESOLUTION",
+    "type" : "OPEN_RESOLUTION"
+  }],
+  "nodeConfigurations" : [ {
+    "contextPath" : [ ],
+    "enabled" : true
+  } ],
+  "enabled" : false
+}
