@@ -39,26 +39,33 @@
 
 package org.dcm4chee.archive.monitoring.impl.config;
 
+import java.util.Collections;
 import java.util.List;
+
+import org.dcm4chee.archive.monitoring.impl.core.clocks.ClockProvider;
+import org.dcm4chee.archive.monitoring.impl.core.module.MonitoringModuleManager;
 
 /**
  * 
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  */
 public class Configuration {
+    private MonitoringModuleManager moduleManager;
+    private ClockProvider clockProvider;
+    
     private StartupConfiguration startupConfiguration;
     private MetricRegistryConfiguration registryConfiguration;
     private RuleConfiguration ruleConfiguration;
     private List<MetricReservoirConfiguration> metricReservoirConfigurations;
-    private List<NodeConfiguration> nodeConfigurations;
-    private boolean enabled;
+    private List<NodeConfiguration> nodeConfigurations = Collections.emptyList();
+    private boolean globalEnabled = true;
     
-    public boolean isEnabled() {
-        return enabled;
+    public boolean isGlobalEnabled() {
+        return globalEnabled;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setGlobalEnabled(boolean globalEnabled) {
+        this.globalEnabled = globalEnabled;
     }
     
     public MetricRegistryConfiguration getRegistryConfiguration() {
@@ -99,6 +106,22 @@ public class Configuration {
 
     public void setNodeConfigurations(List<NodeConfiguration> nodeConfigurations) {
         this.nodeConfigurations = nodeConfigurations;
+    }
+    
+    public void setClockProvider(ClockProvider clockProvider) {
+        this.clockProvider = clockProvider;
+    }
+    
+    public ClockProvider getClockProvider() {
+        return clockProvider;
+    }
+
+    public MonitoringModuleManager getModuleManager() {
+        return moduleManager;
+    }
+
+    public void setModuleManager(MonitoringModuleManager moduleManager) {
+        this.moduleManager = moduleManager;
     }
     
 }

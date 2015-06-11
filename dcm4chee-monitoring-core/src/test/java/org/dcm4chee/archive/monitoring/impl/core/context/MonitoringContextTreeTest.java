@@ -42,9 +42,10 @@ package org.dcm4chee.archive.monitoring.impl.core.context;
 
 import java.util.Arrays;
 
+import org.dcm4chee.archive.monitoring.impl.config.Configuration;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration.RESERVOIR_TYPE;
-import org.dcm4chee.archive.monitoring.impl.config.MonitoringConfiguration;
+import org.dcm4chee.archive.monitoring.impl.config.MonitoringBuilder;
 import org.dcm4chee.archive.monitoring.impl.core.Counter;
 import org.dcm4chee.archive.monitoring.impl.core.ManualClock;
 import org.dcm4chee.archive.monitoring.impl.core.Metric;
@@ -73,16 +74,18 @@ public class MonitoringContextTreeTest {
 	@Before
 	public void before() {
 	    clock = new ManualClock(0, 500, UnitOfTime.MILLISECONDS);
-		MonitoringConfiguration cfg = new MonitoringConfiguration();
-		cfg.setClockProvider(clock);
-		
-		MetricReservoirConfiguration reservoirCfg = createDefaultMetricReservoirConfiguration();
-		
-		cfg.setReservoirConfigurations(Arrays.asList(reservoirCfg));
-		provider = cfg.createMetricProvider();
-		contextProvider = provider.getMonitoringContextProvider();
-		metricFactory = provider.getMetricFactory();
-		metricRegistry = (MonitoringContextTree)provider.getMetricRegistry();
+	
+		Configuration cfg = new Configuration();
+        cfg.setClockProvider(clock);
+        
+        MetricReservoirConfiguration reservoirCfg = createDefaultMetricReservoirConfiguration();
+        cfg.setMetricReservoirConfigurations(Arrays.asList(reservoirCfg));
+        
+        provider = new MonitoringBuilder(cfg).createMetricProvider();
+        
+        contextProvider = provider.getMonitoringContextProvider();
+        metricFactory = provider.getMetricFactory();
+        metricRegistry = (MonitoringContextTree)provider.getMetricRegistry();
 	}
 	
 	private MetricReservoirConfiguration createDefaultMetricReservoirConfiguration() {

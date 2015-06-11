@@ -42,9 +42,10 @@ package org.dcm4chee.archive.monitoring.impl.core;
 import java.util.Arrays;
 import java.util.Random;
 
+import org.dcm4chee.archive.monitoring.impl.config.Configuration;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration.RESERVOIR_TYPE;
-import org.dcm4chee.archive.monitoring.impl.config.MonitoringConfiguration;
+import org.dcm4chee.archive.monitoring.impl.config.MonitoringBuilder;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.Aggregate;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.AggregateSnapshot;
 import org.dcm4chee.archive.monitoring.impl.core.clocks.Clock;
@@ -54,8 +55,8 @@ import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContextProvider;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoir;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoirSnapshot;
-import org.dcm4chee.archive.monitoring.impl.core.reservoir.RoundRobinReservoir;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.ReservoirBuilder.START_SPECIFICATION;
+import org.dcm4chee.archive.monitoring.impl.core.reservoir.RoundRobinReservoir;
 import org.dcm4chee.archive.monitoring.impl.util.UnitOfTime;
 import org.junit.After;
 import org.junit.Assert;
@@ -91,11 +92,11 @@ public class TimerTest {
 	}
 	
 	private void initProvider(ClockProvider clock, MetricReservoirConfiguration... config) {
-		MonitoringConfiguration cfg = new MonitoringConfiguration();
+		Configuration cfg = new Configuration();
 		cfg.setClockProvider(clock);
-		cfg.setReservoirConfigurations(Arrays.asList(config));
+		cfg.setMetricReservoirConfigurations(Arrays.asList(config));
 		
-		provider = cfg.createMetricProvider();
+		provider = new MonitoringBuilder(cfg).createMetricProvider();
 		
 		contextProvider = provider.getMonitoringContextProvider();
 		metricFactory = provider.getMetricFactory();

@@ -42,8 +42,9 @@ package org.dcm4chee.archive.monitoring.impl.core;
 import java.util.Arrays;
 import java.util.List;
 
+import org.dcm4chee.archive.monitoring.impl.config.Configuration;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration;
-import org.dcm4chee.archive.monitoring.impl.config.MonitoringConfiguration;
+import org.dcm4chee.archive.monitoring.impl.config.MonitoringBuilder;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration.RESERVOIR_TYPE;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContextProvider;
@@ -73,13 +74,13 @@ public class RoundRobinReservoirBackedTimerTest {
 		
 		clock = new ManualClock(START, TICK, UnitOfTime.NANOSECONDS);
 		
-		MonitoringConfiguration cfg = new MonitoringConfiguration();
+		Configuration cfg = new Configuration();
 		cfg.setClockProvider(clock);
 		
 		MetricReservoirConfiguration reservoirCfg = createDefaultMetricReservoirConfiguration();
         
-		cfg.setReservoirConfigurations(Arrays.asList(reservoirCfg));
-		MetricProvider provider = cfg.createMetricProvider();
+		cfg.setMetricReservoirConfigurations(Arrays.asList(reservoirCfg));
+		MetricProvider provider = new MonitoringBuilder(cfg).createMetricProvider();
 		
 		reservoirFactory = provider.getReservoirFactory();
 		contextProvider = provider.getMonitoringContextProvider();

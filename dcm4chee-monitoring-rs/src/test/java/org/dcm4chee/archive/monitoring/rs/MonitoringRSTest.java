@@ -45,9 +45,10 @@ import java.util.Arrays;
 
 import javax.inject.Inject;
 
+import org.dcm4chee.archive.monitoring.impl.config.Configuration;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration;
-import org.dcm4chee.archive.monitoring.impl.config.MonitoringConfiguration;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration.RESERVOIR_TYPE;
+import org.dcm4chee.archive.monitoring.impl.config.MonitoringBuilder;
 import org.dcm4chee.archive.monitoring.impl.core.ApplicationMonitoringRegistry;
 import org.dcm4chee.archive.monitoring.impl.core.Counter;
 import org.dcm4chee.archive.monitoring.impl.core.MetricProvider;
@@ -96,13 +97,13 @@ public class MonitoringRSTest {
 	public static void before() {
 		clock = new ManualClock(1l, 1l, UnitOfTime.NANOSECONDS);
 		
-		MonitoringConfiguration cfg = new MonitoringConfiguration();
+		Configuration cfg = new Configuration();
 		cfg.setClockProvider(clock);
 		
 		MetricReservoirConfiguration reservoirCfg = createDefaultMetricReservoirConfiguration();
         
-		cfg.setReservoirConfigurations(Arrays.asList(reservoirCfg));
-		cfg.createMetricProvider();
+		cfg.setMetricReservoirConfigurations(Arrays.asList(reservoirCfg));
+		new MonitoringBuilder(cfg).createMetricProvider();
 	}
 	
 	private static MetricReservoirConfiguration createDefaultMetricReservoirConfiguration() {
