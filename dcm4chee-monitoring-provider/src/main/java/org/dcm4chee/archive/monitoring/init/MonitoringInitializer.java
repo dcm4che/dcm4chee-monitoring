@@ -39,6 +39,8 @@
 
 package org.dcm4chee.archive.monitoring.init;
 
+import static java.lang.String.format;
+
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -62,7 +64,11 @@ import org.slf4j.LoggerFactory;
 public class MonitoringInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MonitoringInitializer.class);
     
-    private static final String CONFIG_FILE_NAME = "monitoring.cfg";
+    private static final String CSP_MONITORING_CONFIG_FILE = "csp-monitoring-cfg-file";
+    private static final String CSP_MONITORING_CONFIG_CLASSPATHFILE = "csp-monitoring-cfg-classpathfile";
+    private static final String CSP_MONITORING_CONFIG_ENV_VAR = "CSP-MONITORING-CFG-FILE";
+    private static final String CSP_MONITORING_CONFIG_CLASSPATHFILE_DEFAULT = "monitoring.cfg";
+    
     
     @Inject
     private MonitoringModuleManager moduleManager;
@@ -70,11 +76,43 @@ public class MonitoringInitializer {
 	@PostConstruct
 	public void initialize() {
 	    ClassLoader classloader = this.getClass().getClassLoader();
-	    Configuration monitoringCfg = new JsonMonitoringConfigurationProvider().createConfigurationFromClasspath(
-	            classloader, CONFIG_FILE_NAME);
+	    
+	    Configuration monitoringCfg = null;
+	    
+	    // 1) Try to load config from file system via system property
+	    String configFilePath = System.getProperty(CSP_MONITORING_CONFIG_FILE);
+	    if(configFilePath != null ) {
+	        LOGGER.info(format("Trying to load monitoring configuration file specified by property '%s': %s", 
+	                CSP_MONITORING_CONFIG_FILE, configFilePath ) );
+	        monitoringCfg = new JsonMonitoringConfigurationProvider().createConfiguration(configFilePath);
+	    } else {
+	        // 2) Try to load config from classpath via system property
+	        String classPathFileName = System.getProperty(CSP_MONITORING_CONFIG_CLASSPATHFILE);
+	        if(classPathFileName != null) {
+	            LOGGER.info("Trying to load monitoring configuration classpath file " + classPathFileName );
+	            LOGGER.info(format("Trying to load monitoring configuration classpath file specified by property '%s': %s", 
+	                    CSP_MONITORING_CONFIG_CLASSPATHFILE, classPathFileName ) );
+	            monitoringCfg = new JsonMonitoringConfigurationProvider().createConfigurationFromClasspath(
+	                    classloader, classPathFileName);
+	        } else {
+	            // 3) Try to load config from file system via environment variable
+	            configFilePath = System.getenv(CSP_MONITORING_CONFIG_ENV_VAR);
+	            if(configFilePath != null) {
+	                LOGGER.info(format("Trying to load monitoring configuration file specified by environment variable '%s': %s",
+	                        CSP_MONITORING_CONFIG_ENV_VAR, configFilePath ));
+	                monitoringCfg = new JsonMonitoringConfigurationProvider().createConfiguration(configFilePath);
+	            } else {
+	                // 4) Try to load config from classpath file with default name
+	                LOGGER.info(format("Trying to load monitoring configuration classpath default file: %s", 
+	                        CSP_MONITORING_CONFIG_CLASSPATHFILE_DEFAULT) );
+	                monitoringCfg = new JsonMonitoringConfigurationProvider().createConfigurationFromClasspath(
+	                        classloader, CSP_MONITORING_CONFIG_CLASSPATHFILE_DEFAULT);
+	            }
+	        }
+	    }
 	    
 	    if(monitoringCfg == null) {
-	        LOGGER.error("No monitoring configuration file found in classpath");
+	        LOGGER.error("Monitoring configuration file could not be loaded");
 	        return;
 	    }
 	    

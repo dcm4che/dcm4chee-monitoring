@@ -101,5 +101,5 @@ public class JsonMonitoringConfigurationProvider {
             }
         }
     }
-    
+        
 }
