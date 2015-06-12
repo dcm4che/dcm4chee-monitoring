@@ -39,64 +39,44 @@
 
 package org.dcm4chee.archive.monitoring.impl.core.module;
 
-import static java.lang.String.format;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
+
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  *
  */
-@ApplicationScoped
-public class MonitoringModuleManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MonitoringModuleManager.class);
-    
-    @Inject
-    private Instance<MonitoringModule> modules;
-    
-    public boolean startModule(String name) {
-        MonitoringModule module = getModule(name);
-        return (module != null) ? startModule(module) : false;
+@RunWith(Arquillian.class)
+public class ModuleManagerTest {
+	
+	@Inject
+	private MonitoringModuleManager moduleManager;
+	
+	@Deployment
+    public static JavaArchive createDeployment1() {
+        JavaArchive archive = ShrinkWrap.create(JavaArchive.class)
+                .addClass(MonitoringModuleManager.class)
+                .addClass(DummyModuleA.class)
+                .addClass(DummyModuleB.class)
+                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+
+        return archive;
     }
-    
-    private MonitoringModule getModule(String name) {
-        for(MonitoringModule module : modules) {
-            if(name.equalsIgnoreCase(module.getName())) {
-                return module;
-            }
-        }
-        
-        return null;
-    }
-    
-    private boolean startModule(MonitoringModule module) {
-        try {
-            module.start();
-            return true;
-        } catch(Exception e ) {
-            LOGGER.error(format("Error while starting monitoring module %s", module.getName()), e);
-            return false;
-        }
-    }
-    
-    public void startModules() {
-        for(MonitoringModule module : modules) {
-            startModule(module);
-        }
-    }
-    
-    public void stopModules() {
-        for(MonitoringModule module : modules) {
-            try {
-                module.stop();
-            } catch(Exception e ) {
-                LOGGER.error(format("Error while stopping monitoring module %s", module.getName()), e);
-            }
-        }
-    }
+	
+	@Test
+	public void testModuleStart() {
+	    Assert.assertTrue(moduleManager.startModule("DummyModuleA"));
+	    Assert.assertTrue(moduleManager.startModule("DummyModuleB"));
+	}
+	
 }

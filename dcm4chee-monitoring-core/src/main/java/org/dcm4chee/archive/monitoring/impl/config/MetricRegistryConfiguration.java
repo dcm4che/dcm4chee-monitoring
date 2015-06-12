@@ -44,8 +44,8 @@ package org.dcm4chee.archive.monitoring.impl.config;
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  */
 public class MetricRegistryConfiguration {
-    private long consumedMetricTimeout;
-    private long metricCleanupDaemonRunPeriod;
+    private long consumedMetricTimeout = -1;
+    private long metricCleanupDaemonRunPeriod = -1;
     
     public long getConsumedMetricTimeout() {
         return consumedMetricTimeout;

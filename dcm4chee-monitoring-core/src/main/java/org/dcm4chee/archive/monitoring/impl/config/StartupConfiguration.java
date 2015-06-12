@@ -39,6 +39,7 @@
 
 package org.dcm4chee.archive.monitoring.impl.config;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,7 +47,7 @@ import java.util.List;
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  */
 public class StartupConfiguration {
-    private List<MetricConfiguration> metrics;
+    private List<MetricConfiguration> metrics = Collections.emptyList();
 
     public List<MetricConfiguration> getMetrics() {
         return metrics;

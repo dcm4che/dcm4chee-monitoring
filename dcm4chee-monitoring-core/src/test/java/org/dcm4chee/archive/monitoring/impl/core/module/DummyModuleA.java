@@ -39,64 +39,23 @@
 
 package org.dcm4chee.archive.monitoring.impl.core.module;
 
-import static java.lang.String.format;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
+public class DummyModuleA implements MonitoringModule {
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-/**
- * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
- *
- */
-@ApplicationScoped
-public class MonitoringModuleManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MonitoringModuleManager.class);
-    
-    @Inject
-    private Instance<MonitoringModule> modules;
-    
-    public boolean startModule(String name) {
-        MonitoringModule module = getModule(name);
-        return (module != null) ? startModule(module) : false;
+    @Override
+    public String getName() {
+        return DummyModuleA.class.getSimpleName();
     }
-    
-    private MonitoringModule getModule(String name) {
-        for(MonitoringModule module : modules) {
-            if(name.equalsIgnoreCase(module.getName())) {
-                return module;
-            }
-        }
+
+    @Override
+    public void start() {
         
-        return null;
+    }
+
+
+    @Override
+    public void stop() {
+        
     }
     
-    private boolean startModule(MonitoringModule module) {
-        try {
-            module.start();
-            return true;
-        } catch(Exception e ) {
-            LOGGER.error(format("Error while starting monitoring module %s", module.getName()), e);
-            return false;
-        }
-    }
-    
-    public void startModules() {
-        for(MonitoringModule module : modules) {
-            startModule(module);
-        }
-    }
-    
-    public void stopModules() {
-        for(MonitoringModule module : modules) {
-            try {
-                module.stop();
-            } catch(Exception e ) {
-                LOGGER.error(format("Error while stopping monitoring module %s", module.getName()), e);
-            }
-        }
-    }
 }

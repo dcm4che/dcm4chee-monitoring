@@ -87,7 +87,7 @@ public class MonitoringBuilder {
             setupMetricCleanDeamon(metricProvider);
             setupStartupMetrics(metricProvider);
             setupForwardRules();
-            startModules();
+            startEnabledModules();
             
             return metricProvider;
         } catch (Exception e) {
@@ -100,9 +100,13 @@ public class MonitoringBuilder {
         MetricRegistryConfiguration registryCfg = cfg.getRegistryConfiguration();
         if(registryCfg != null) {
             long consumedMetricTimeoutMillis = registryCfg.getConsumedMetricTimeout();
-            metricProvider.getMetricRegistry().setConsumedMetricTimeout(consumedMetricTimeoutMillis, UnitOfTime.MILLISECONDS);
+            if(consumedMetricTimeoutMillis > 0) {
+                metricProvider.getMetricRegistry().setConsumedMetricTimeout(consumedMetricTimeoutMillis, UnitOfTime.MILLISECONDS);
+            }
             long metricCleanupDaeomonRunPeriodMillis = registryCfg.getMetricCleanupDaemonRunPeriod();
-            metricProvider.getMetricRegistry().startMetricCleanupDaemon(metricCleanupDaeomonRunPeriodMillis, UnitOfTime.MILLISECONDS);
+            if(metricCleanupDaeomonRunPeriodMillis > 0) {
+                metricProvider.getMetricRegistry().startMetricCleanupDaemon(metricCleanupDaeomonRunPeriodMillis, UnitOfTime.MILLISECONDS);
+            }
         }
     }
     
@@ -119,8 +123,7 @@ public class MonitoringBuilder {
                 switch (metricType) {
                 case "SumAggregate":
                     metricFactory.sumAggregate(metricCxt);
-                    LOGGER.info("Created startup metric {} {}", metricType,
-                            metricCxt);
+                    LOGGER.info("Created startup metric {} {}", metricType, metricCxt);
                     break;
                 default:
                     LOGGER.error("Unknown metric type {}", metricType);
@@ -139,10 +142,20 @@ public class MonitoringBuilder {
         }
     }
 
-    private void startModules() {
+    private void startEnabledModules() {
         MonitoringModuleManager moduleManager = cfg.getModuleManager();
         if (moduleManager != null) {
-            moduleManager.startModules();
+            for (ModuleConfiguration moduleCfg : cfg.getModuleConfigurations()) {
+                if (moduleCfg.isEnabled()) {
+                    String moduleName = moduleCfg.getModuleName();
+                    boolean started = moduleManager.startModule(moduleName);
+                    if(started) {
+                        LOGGER.info("Started monitoring module: " +  moduleName);
+                    } else {
+                        LOGGER.info("Could not start monitoring module: " +  moduleName);
+                    }
+                }
+            }
         }
     }
 

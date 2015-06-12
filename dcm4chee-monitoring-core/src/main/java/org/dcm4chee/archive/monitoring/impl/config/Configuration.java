@@ -53,12 +53,13 @@ public class Configuration {
     private MonitoringModuleManager moduleManager;
     private ClockProvider clockProvider;
     
+    private boolean globalEnabled = true;
     private StartupConfiguration startupConfiguration;
     private MetricRegistryConfiguration registryConfiguration;
     private RuleConfiguration ruleConfiguration;
     private List<MetricReservoirConfiguration> metricReservoirConfigurations;
     private List<NodeConfiguration> nodeConfigurations = Collections.emptyList();
-    private boolean globalEnabled = true;
+    private List<ModuleConfiguration> moduleConfigurations = Collections.emptyList();
     
     public boolean isGlobalEnabled() {
         return globalEnabled;
@@ -108,6 +109,14 @@ public class Configuration {
         this.nodeConfigurations = nodeConfigurations;
     }
     
+    public List<ModuleConfiguration> getModuleConfigurations() {
+        return moduleConfigurations;
+    }
+
+    public void setModuleConfigurations(List<ModuleConfiguration> moduleConfigurations) {
+        this.moduleConfigurations = moduleConfigurations;
+    }
+
     public void setClockProvider(ClockProvider clockProvider) {
         this.clockProvider = clockProvider;
     }

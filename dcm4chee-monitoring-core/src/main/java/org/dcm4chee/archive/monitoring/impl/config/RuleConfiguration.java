@@ -39,6 +39,7 @@
 
 package org.dcm4chee.archive.monitoring.impl.config;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,7 +47,7 @@ import java.util.List;
  *
  */
 public class RuleConfiguration {
-    private List<ForwardRuleConfiguration> forwardRules;
+    private List<ForwardRuleConfiguration> forwardRules = Collections.emptyList();
 
     public List<ForwardRuleConfiguration> getForwardRules() {
         return forwardRules;
