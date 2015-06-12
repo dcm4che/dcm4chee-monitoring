@@ -64,8 +64,8 @@ import org.slf4j.LoggerFactory;
 public class MonitoringInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MonitoringInitializer.class);
     
-    private static final String CSP_MONITORING_CONFIG_FILE = "csp-monitoring-cfg-file";
-    private static final String CSP_MONITORING_CONFIG_CLASSPATHFILE = "csp-monitoring-cfg-classpathfile";
+    private static final String CSP_MONITORING_CONFIG_FILE_PROP = "csp-monitoring-cfg-file";
+    private static final String CSP_MONITORING_CONFIG_CLASSPATHFILE_PROP = "csp-monitoring-cfg-classpathfile";
     private static final String CSP_MONITORING_CONFIG_ENV_VAR = "CSP-MONITORING-CFG-FILE";
     private static final String CSP_MONITORING_CONFIG_CLASSPATHFILE_DEFAULT = "monitoring.cfg";
     
@@ -80,18 +80,18 @@ public class MonitoringInitializer {
 	    Configuration monitoringCfg = null;
 	    
 	    // 1) Try to load config from file system via system property
-	    String configFilePath = System.getProperty(CSP_MONITORING_CONFIG_FILE);
+	    String configFilePath = System.getProperty(CSP_MONITORING_CONFIG_FILE_PROP);
 	    if(configFilePath != null ) {
 	        LOGGER.info(format("Trying to load monitoring configuration file specified by property '%s': %s", 
-	                CSP_MONITORING_CONFIG_FILE, configFilePath ) );
+	                CSP_MONITORING_CONFIG_FILE_PROP, configFilePath ) );
 	        monitoringCfg = new JsonMonitoringConfigurationProvider().createConfiguration(configFilePath);
 	    } else {
 	        // 2) Try to load config from classpath via system property
-	        String classPathFileName = System.getProperty(CSP_MONITORING_CONFIG_CLASSPATHFILE);
+	        String classPathFileName = System.getProperty(CSP_MONITORING_CONFIG_CLASSPATHFILE_PROP);
 	        if(classPathFileName != null) {
 	            LOGGER.info("Trying to load monitoring configuration classpath file " + classPathFileName );
 	            LOGGER.info(format("Trying to load monitoring configuration classpath file specified by property '%s': %s", 
-	                    CSP_MONITORING_CONFIG_CLASSPATHFILE, classPathFileName ) );
+	                    CSP_MONITORING_CONFIG_CLASSPATHFILE_PROP, classPathFileName ) );
 	            monitoringCfg = new JsonMonitoringConfigurationProvider().createConfigurationFromClasspath(
 	                    classloader, classPathFileName);
 	        } else {
