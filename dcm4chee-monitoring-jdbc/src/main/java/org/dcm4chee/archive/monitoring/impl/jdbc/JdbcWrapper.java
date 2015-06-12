@@ -31,6 +31,18 @@ public final class JdbcWrapper {
 	private static final String[] USED_CONNECTIONS_CXT = new String[] { "jdbc", "connections", "used" };
 	private static final String[] ACTIVE_CONNECTIONS_CXT = new String[] { "jdbc", "connections", "active" };
 	
+	private static final String[] JDBC_CONNECTIONS = new String[] { "jdbc", "connections" };
+	private static final String CONNECTION = "connection";
+	private static final String STATEMENT = "statement";
+
+	private static final String PREPARE_STATEMENT_METHOD_NAME = "prepareStatement";
+	private static final String PREPARE_CALL_METHOD_NAME = "prepareCall";
+	private static final String ADD_BATCH_METHOD_NAME = "addBatch";
+	private static final String CLOSE_METHOD_NAME = "close";
+	
+	private static final String EXECTURE_METHOD_NAME_PREFIX = "execute";
+	private static final String EXPLAIN_STATEMENT_PREFIX = "explain ";
+	
 	/**
 	 * Instance singleton
 	 */
@@ -63,7 +75,7 @@ public final class JdbcWrapper {
 		}
 		
 		private void initMonitoringContext(MonitoringContext parentMonitoringContext) {
-			this.monitoringContext = parentMonitoringContext.getOrCreateInstanceContext(statement, "statement");
+			this.monitoringContext = parentMonitoringContext.getOrCreateInstanceContext(statement, STATEMENT);
 		}
 
 		@Override
@@ -73,7 +85,7 @@ public final class JdbcWrapper {
 				return statement.equals(args[0]);
 			} else if (isHashCodeMethod(methodName, args)) {
 				return statement.hashCode();
-			} else if (methodName.startsWith("execute")) {
+			} else if (methodName.startsWith(EXECTURE_METHOD_NAME_PREFIX)) {
 				if (isFirstArgAString(args)) {
 					requestName = (String) args[0];
 				}
@@ -85,7 +97,7 @@ public final class JdbcWrapper {
 				monitoringContext.dispose();
 				
 				return result;
-			} else if ("addBatch".equals(methodName) && isFirstArgAString(args)) {
+			} else if (ADD_BATCH_METHOD_NAME.equals(methodName) && isFirstArgAString(args)) {
 				requestName = (String) args[0];
 			}
 
@@ -107,11 +119,11 @@ public final class JdbcWrapper {
 		}
 		
 		private void initMonitoringContext() {
-			this.monitoringContext = getContextProvider().getActiveInstanceContext().getOrCreateInstanceContext(connection, "connection");
+			this.monitoringContext = getContextProvider().getActiveInstanceContext().getOrCreateInstanceContext(connection, CONNECTION);
 		}
 
 		private void init() {
-			MonitoringContext context = getContextProvider().getNodeContext().getOrCreateInstanceContext(connection, "jdbc", "connections");
+			MonitoringContext context = getContextProvider().getNodeContext().getOrCreateInstanceContext(connection, JDBC_CONNECTIONS);
 			getMetricFactory().register(context, new ConnectionInformation());
 			
 			incUsedConnectionCounter();
@@ -139,7 +151,7 @@ public final class JdbcWrapper {
 				Object result = method.invoke(connection, args);
 				if (result instanceof Statement) {
 					final String requestName;
-					if ("prepareStatement".equals(methodName) || "prepareCall".equals(methodName)) {
+					if (PREPARE_STATEMENT_METHOD_NAME.equals(methodName) || PREPARE_CALL_METHOD_NAME.equals(methodName)) {
 						requestName = (String) args[0];
 					} else {
 						requestName = null;
@@ -149,10 +161,10 @@ public final class JdbcWrapper {
 				}
 				return result;
 			} finally {
-				if ("close".equals(methodName) && !alreadyClosed) {
+				if (CLOSE_METHOD_NAME.equals(methodName) && !alreadyClosed) {
 					decUsedConnectionCounter();
 					
-					MonitoringContext context = getContextProvider().getNodeContext().getOrCreateInstanceContext(connection, "jdbc", "connections");
+					MonitoringContext context = getContextProvider().getNodeContext().getOrCreateInstanceContext(connection, JDBC_CONNECTIONS);
 					context.dispose();
 					alreadyClosed = true;
 				}
@@ -214,7 +226,6 @@ public final class JdbcWrapper {
 		private final InvocationHandler delegate;
 
 		private DelegatingInvocationHandler(InvocationHandler delegate) {
-			super();
 			this.delegate = delegate;
 		}
 
@@ -257,7 +268,7 @@ public final class JdbcWrapper {
 
 	private Object doExecute(String requestName, Statement statement, Method method, Object[] args, MonitoringContext statementMonitoringContext)
 			throws IllegalAccessException, InvocationTargetException {
-		if (requestName.startsWith("explain ")) {
+		if (requestName.startsWith(EXPLAIN_STATEMENT_PREFIX)) {
 			incActiveConnectionCounter();
 			try {
 				return method.invoke(statement, args);
