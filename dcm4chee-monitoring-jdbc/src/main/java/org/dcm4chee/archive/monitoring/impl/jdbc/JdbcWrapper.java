@@ -112,14 +112,13 @@ public final class JdbcWrapper {
 	private class ConnectionInvocationHandler implements InvocationHandler {
 		private final Connection connection;
 		private boolean alreadyClosed;
-		private MonitoringContext monitoringContext;
 
 		private ConnectionInvocationHandler(Connection connection) {
 			this.connection = connection;
 		}
 		
-		private void initMonitoringContext() {
-			this.monitoringContext = getContextProvider().getActiveInstanceContext().getOrCreateInstanceContext(connection, CONNECTION);
+		private MonitoringContext initMonitoringContext() {
+			return getContextProvider().getActiveInstanceContext().getOrCreateInstanceContext(connection, CONNECTION);
 		}
 
 		private void init() {
@@ -156,8 +155,8 @@ public final class JdbcWrapper {
 					} else {
 						requestName = null;
 					}
-					initMonitoringContext();
-					result = createStatementProxy(requestName, (Statement) result, monitoringContext);
+					MonitoringContext cxt = initMonitoringContext();
+					result = createStatementProxy(requestName, (Statement) result, cxt);
 				}
 				return result;
 			} finally {
@@ -278,7 +277,7 @@ public final class JdbcWrapper {
 		}
 
 //		boolean systemError = true;
-		Timer.Split timerContext = getMetricFactory().timer(statementMonitoringContext, Timer.TYPE.ONE_SHOT).time();
+		Timer.Split timerSplit = getMetricFactory().timer(statementMonitoringContext, Timer.TYPE.ONE_SHOT).time();
 		try {
 			incActiveConnectionCounter();
 			
@@ -300,7 +299,7 @@ public final class JdbcWrapper {
 //			if ( systemError ) {
 //				timerContext.setAttribute("sql.error", "true");
 //			}
-			timerContext.stop();
+			timerSplit.stop();
 		}
 	}
 	
