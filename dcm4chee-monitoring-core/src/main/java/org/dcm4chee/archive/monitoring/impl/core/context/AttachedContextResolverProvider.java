@@ -91,7 +91,7 @@ public class AttachedContextResolverProvider {
 						MonitoringContextProvider cxtProvider = MetricProvider.getInstance().getMonitoringContextProvider();
 						MonitoringContext fwTargetCxt = cxtProvider.getRootContext().getContext(fwTarget);
 						if (fwTargetCxt != null) {
-							LOGGER.info("Found matching context forwarding rule: {} -> {}", cxt, fwTargetCxt);
+							LOGGER.debug("Found matching context forwarding rule: {} -> {}", cxt, fwTargetCxt);
 							attachableContexts.add(fwTargetCxt);
 						}
 					}

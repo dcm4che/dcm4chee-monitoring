@@ -59,6 +59,8 @@ import org.slf4j.LoggerFactory;
 public class RoundRobinReservoir implements AggregatedReservoir {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RoundRobinReservoir.class);
 	
+	private final static int VALUE_ARCHIVE_MAX_SIZE_DEFAULT = 10000;
+	
 	// archive containers sorted by increasing resolution
 	private final ArchiveContainer[] containers;
 	private final long step;
@@ -149,7 +151,7 @@ public class RoundRobinReservoir implements AggregatedReservoir {
             }
             
             long end = builder.start + resolution;
-            Archive firstArchive = archiveSpec.isValueArchive() ? new ValueArchive(builder.start, end, resolution, 100) : 
+            Archive firstArchive = archiveSpec.isValueArchive() ? new ValueArchive(builder.start, end, resolution, VALUE_ARCHIVE_MAX_SIZE_DEFAULT) : 
                 new Archive(builder.start, end, resolution);
             ArchiveContainer container = new ArchiveContainer(resolution, archiveSpec.getRetentions(), firstArchive);
             containers[i] = container;
