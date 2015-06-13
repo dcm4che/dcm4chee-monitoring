@@ -9,7 +9,7 @@ import org.dcm4chee.archive.monitoring.impl.config.Configuration;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration.RESERVOIR_TYPE;
 import org.dcm4chee.archive.monitoring.impl.config.MonitoringBuilder;
-import org.dcm4chee.archive.monitoring.impl.core.Meter.METER_CONFIGURATION;
+import org.dcm4chee.archive.monitoring.impl.core.Meter.TYPE;
 import org.dcm4chee.archive.monitoring.impl.core.clocks.ClockProvider;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContextProvider;
@@ -76,7 +76,7 @@ public class MeterTest {
     @Test
     public void testOpenResolutionMeter() {
         MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
-        Meter meter = metricFactory.meter(serviceCxt, METER_CONFIGURATION.OPEN_RESOLUTION);
+        Meter meter = metricFactory.meter(serviceCxt, TYPE.OPEN_RESOLUTION);
         meter.mark();
         
         clock.tick(2);
@@ -98,7 +98,7 @@ public class MeterTest {
     @Test
     public void test1SecResolutionMeter() {
         MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
-        Meter meter = metricFactory.meter(serviceCxt, METER_CONFIGURATION.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
+        Meter meter = metricFactory.meter(serviceCxt, TYPE.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
         meter.mark(5);
         
         clock.tick(1);
@@ -121,7 +121,7 @@ public class MeterTest {
     @Test
     public void test1SecResolutionMeter2() {
         MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
-        Meter meter = metricFactory.meter(serviceCxt, METER_CONFIGURATION.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
+        Meter meter = metricFactory.meter(serviceCxt, TYPE.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
         meter.mark(5);
         
         clock.tick(1);
@@ -148,7 +148,7 @@ public class MeterTest {
     @Test
     public void test1SecResolutionMeter3() {
         MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
-        Meter meter = metricFactory.meter(serviceCxt, METER_CONFIGURATION.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
+        Meter meter = metricFactory.meter(serviceCxt, TYPE.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
         
         //time: 0sec
         meter.mark(5);

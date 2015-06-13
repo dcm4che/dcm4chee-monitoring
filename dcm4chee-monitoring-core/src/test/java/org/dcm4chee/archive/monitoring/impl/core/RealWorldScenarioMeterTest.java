@@ -47,7 +47,7 @@ import java.util.TimerTask;
 import org.dcm4chee.archive.monitoring.impl.config.Configuration;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration;
 import org.dcm4chee.archive.monitoring.impl.config.MonitoringBuilder;
-import org.dcm4chee.archive.monitoring.impl.core.Meter.METER_CONFIGURATION;
+import org.dcm4chee.archive.monitoring.impl.core.Meter.TYPE;
 import org.dcm4chee.archive.monitoring.impl.core.clocks.Clock;
 import org.dcm4chee.archive.monitoring.impl.core.clocks.ClockProvider;
 import org.dcm4chee.archive.monitoring.impl.core.clocks.Clocks;
@@ -98,7 +98,7 @@ public class RealWorldScenarioMeterTest {
 //    @Test
     public void test1SecResolutionMeter() {
         MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
-        final Meter meter = metricFactory.meter(serviceCxt, METER_CONFIGURATION.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
+        final Meter meter = metricFactory.meter(serviceCxt, TYPE.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
         
         TimerTask task = new TimerTask() {
             

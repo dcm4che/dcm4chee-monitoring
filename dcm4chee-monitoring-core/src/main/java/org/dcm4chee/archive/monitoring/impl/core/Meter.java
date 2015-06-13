@@ -6,7 +6,7 @@ import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoirSn
 
 public interface Meter extends Metric, Sampling<AggregatedReservoirSnapshot> {
     
-    public static enum METER_CONFIGURATION {
+    public static enum TYPE {
         OPEN_RESOLUTION,
         ONE_SEC_RESOLUTION__5_SEC_HISTORY
     };

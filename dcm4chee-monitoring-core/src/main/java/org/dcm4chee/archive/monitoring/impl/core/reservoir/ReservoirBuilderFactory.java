@@ -46,7 +46,7 @@ import java.util.Map;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration;
 import org.dcm4chee.archive.monitoring.impl.config.MetricReservoirConfiguration.RESERVOIR_TYPE;
 import org.dcm4chee.archive.monitoring.impl.core.Counter;
-import org.dcm4chee.archive.monitoring.impl.core.Meter.METER_CONFIGURATION;
+import org.dcm4chee.archive.monitoring.impl.core.Meter;
 import org.dcm4chee.archive.monitoring.impl.core.Timer;
 import org.dcm4chee.archive.monitoring.impl.core.Util;
 import org.dcm4chee.archive.monitoring.impl.core.clocks.Clock;
@@ -110,7 +110,7 @@ public class ReservoirBuilderFactory {
 	    if(builder != null ) {
 	        return builder.build();
 	    } else {
-	        throw new IllegalArgumentException("No reservoir builder registered for type " + type);
+	        throw new IllegalArgumentException("No reservoir builder registered for timer type " + type);
 	    }
 	   
 	}
@@ -131,27 +131,27 @@ public class ReservoirBuilderFactory {
         if(builder != null ) {
             return builder.build();
         } else {
-            throw new IllegalArgumentException("No reservoir builder registered for type " + type);
+            throw new IllegalArgumentException("No reservoir builder registered for counter type " + type);
         }
     }
 	
-	public AggregatedReservoir createMeterReservoirContainer(METER_CONFIGURATION meterCfg) {
+	public AggregatedReservoir createMeterReservoirContainer(Meter.TYPE type) {
 	    ReservoirBuilder builder = null;
-        switch (meterCfg) {
+        switch (type) {
             case OPEN_RESOLUTION:
-                builder = reservoirBuilders.get(meterCfg.toString());
+                builder = reservoirBuilders.get(type.toString());
                 break;
             case ONE_SEC_RESOLUTION__5_SEC_HISTORY:
-                builder = reservoirBuilders.get(meterCfg.toString());
+                builder = reservoirBuilders.get(type.toString());
                 break;
             default:
-                throw new IllegalArgumentException("Unknown meter configuration " + meterCfg);
+                throw new IllegalArgumentException("Unknown meter type " + type);
         }
         
         if(builder != null ) {
             return builder.build();
         } else {
-            throw new IllegalArgumentException("No reservoir builder registered for type " + meterCfg);
+            throw new IllegalArgumentException("No reservoir builder registered for meter type " + type);
         }
     }
 	

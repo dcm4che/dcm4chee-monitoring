@@ -41,7 +41,7 @@ package org.dcm4chee.archive.monitoring.impl.core;
 
 import java.util.List;
 
-import org.dcm4chee.archive.monitoring.impl.core.Meter.METER_CONFIGURATION;
+import org.dcm4chee.archive.monitoring.impl.core.Meter.TYPE;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.Aggregate;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.SumAggregate;
 import org.dcm4chee.archive.monitoring.impl.core.clocks.Clock;
@@ -123,7 +123,7 @@ public class MetricFactory {
         }
     }
 	
-	public Meter meter(MonitoringContext monitoringContext, METER_CONFIGURATION meterCfg) {
+	public Meter meter(MonitoringContext monitoringContext, TYPE meterCfg) {
         final Meter meter = metricRegistry.getMetric(Meter.class, monitoringContext);
         if (meter != null) {
             return meter;
@@ -189,12 +189,12 @@ public class MetricFactory {
         return counter;
     }
 	
-	private Meter createMeterInt(MonitoringContext context, METER_CONFIGURATION meterCfg) {
+	private Meter createMeterInt(MonitoringContext context, Meter.TYPE type) {
 	    Meter meter = null;
 	    if(!context.isEnabled()) {
 	        meter = NoMeter.INSTANCE;
 	    } else {
-	        meter = new MeterImpl(context, reservoirFactory.createMeterReservoirContainer(meterCfg), clock);
+	        meter = new MeterImpl(context, reservoirFactory.createMeterReservoirContainer(type), clock);
 	    }
 
         metricRegistry.register(context, meter);
