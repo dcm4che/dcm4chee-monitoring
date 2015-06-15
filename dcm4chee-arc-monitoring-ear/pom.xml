@@ -11,7 +11,7 @@
   <artifactId>dcm4chee-arc-monitoring-ear</artifactId>
   <packaging>ear</packaging>
   <properties>
-    <monitoring-version>0.1.0-SNAPSHOT</monitoring-version>
+    <monitoring-version>0.3.0-SNAPSHOT</monitoring-version>
   </properties>
   <dependencies>
     <dependency>

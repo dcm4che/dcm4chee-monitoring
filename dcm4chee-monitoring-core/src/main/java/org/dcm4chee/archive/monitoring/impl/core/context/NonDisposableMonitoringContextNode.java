@@ -52,17 +52,20 @@ import org.dcm4chee.archive.monitoring.impl.core.Util;
 public class NonDisposableMonitoringContextNode extends MonitoringContextNode {
     private static final String UNDEFINED_NODE_NAME = "undefined";
     
-	protected NonDisposableMonitoringContextNode undefinedNode;
-	protected NonDisposableMonitoringContextNode nodeNode;
+    private final boolean undefined;
+	private NonDisposableMonitoringContextNode undefinedNode;
+	private NonDisposableMonitoringContextNode nodeNode;
 	
 	
 	public NonDisposableMonitoringContextNode(MonitoringContextTree tree, boolean enabled) {
 		super(tree, enabled);
+		this.undefined = false;
 	}
 	
-	protected NonDisposableMonitoringContextNode(MonitoringContextTree tree, MonitoringContextNode parent, 
-	        boolean enabled, boolean inheritedFromParent, String... path) {
+	private NonDisposableMonitoringContextNode(MonitoringContextTree tree, MonitoringContextNode parent, 
+	        boolean enabled, boolean inheritedFromParent, boolean undefined, String... path) {
 		super(tree, parent, enabled, inheritedFromParent, path);
+		this.undefined = undefined;
 	}
 	
 	@Override
@@ -84,7 +87,7 @@ public class NonDisposableMonitoringContextNode extends MonitoringContextNode {
 		    undefinedNodePath[ undefinedNodePath.length - 1] = UNDEFINED_NODE_NAME;
 		    
 			undefinedNode = new NonDisposableMonitoringContextNode(tree, this, 
-			        enabled, inheritedFromParent, undefinedNodePath);
+			        enabled, inheritedFromParent, true, undefinedNodePath);
 			if(children == Collections.<MonitoringContextNode>emptyList()) {
 				children = new ArrayList<>();
 			}
@@ -99,7 +102,7 @@ public class NonDisposableMonitoringContextNode extends MonitoringContextNode {
 		if (nodeNode == null) {
 		    String nodeName = Util.getJBossNodeName();
 			nodeNode = new NonDisposableMonitoringContextNode(tree, this, 
-			        enabled, inheritedFromParent, nodeName);
+			        enabled, inheritedFromParent, false, nodeName);
 			if(children == Collections.<MonitoringContextNode>emptyList()) {
 				children = new ArrayList<>();
 			}
@@ -109,5 +112,10 @@ public class NonDisposableMonitoringContextNode extends MonitoringContextNode {
 		
 		return nodeNode;
 	}
+	
+    @Override
+    public boolean isUndefined() {
+        return undefined;
+    }
 	
 }

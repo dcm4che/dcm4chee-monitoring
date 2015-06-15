@@ -47,6 +47,7 @@ import org.dcm4chee.archive.monitoring.impl.core.Util;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoir;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoirSnapshot;
+import org.dcm4chee.archive.monitoring.impl.core.reservoir.Reservoir;
 import org.dcm4chee.archive.monitoring.impl.util.LongAdder;
 
 
@@ -57,14 +58,14 @@ import org.dcm4chee.archive.monitoring.impl.util.LongAdder;
  */
 public class SumAggregate extends AbstractMetric implements Aggregate {
 	private final MonitoringContext context;
-	private final Aggregate aggregate;
+	private final Reservoir forwardReservoir;
 
 	private final LongAdder sum = new LongAdder();
 	private final AggregatedReservoir reservoir;
 	
-	public SumAggregate(MonitoringContext context, Aggregate aggregate, AggregatedReservoir reservoir) {
+	public SumAggregate(MonitoringContext context, Reservoir forwardReservoir, AggregatedReservoir reservoir) {
 		this.context = context;
-		this.aggregate = aggregate;
+		this.forwardReservoir = forwardReservoir;
 		this.reservoir = reservoir;
 	}
 	
@@ -73,9 +74,9 @@ public class SumAggregate extends AbstractMetric implements Aggregate {
 		sum.add(value);
 		long sum = this.sum.sum();
 		reservoir.update(context, now, sum);
-		if (aggregate != null) {
+		if (forwardReservoir != null) {
 			//TODO propagate original context or context of this aggregate?
-			aggregate.update(context, now, value);
+			forwardReservoir.update(context, now, value);
 		}
 	}
 	

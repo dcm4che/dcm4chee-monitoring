@@ -96,10 +96,22 @@ public class MetricFactory {
 		if (metric != null) {
 			return metric;
 		} else {
-			Aggregate parentAggregate = metricRegistry.getAggregate(monitoringContext.getParentContext());
-			return createAggregateInt(parentAggregate, monitoringContext);
+		    ForwardingReservoir forwarding = addAttachedContexts(monitoringContext, null);
+			return createAggregateInt(forwarding, monitoringContext);
 		}
 	}
+	
+	public Aggregate sumAggregateWithForward(MonitoringContext cxt, MonitoringContext forwardCxt) {
+        final Aggregate metric = metricRegistry.getMetric(Aggregate.class, cxt);
+        if (metric != null) {
+            return metric;
+        } else {
+            ForwardingReservoir forwarding = createForward(forwardCxt);
+            forwarding = addAttachedContexts(cxt, forwarding);
+            
+            return createAggregateInt(forwarding, cxt);
+        }
+    }
 	
 	public Timer timer(MonitoringContext monitoringContext) {
 		return timer(monitoringContext, Timer.TYPE.DEFAULT);
@@ -110,13 +122,8 @@ public class MetricFactory {
         if (metric != null) {
             return metric;
         } else {
-            Aggregate forwardAggregate = metricRegistry.getAggregate(forwardCxt);
-            
-            ForwardingReservoir forwarding = null;
-            if(forwardAggregate != null) {
-                forwarding = new ForwardingReservoir();
-                forwarding.addReservoir(forwardAggregate);
-            }
+            ForwardingReservoir forwarding = createForward(forwardCxt);
+            forwarding = addAttachedContexts(cxt, forwarding);
             
             Timer t = new ForwardOnlyTimer(cxt, forwarding, clock);
             metricRegistry.register(cxt, t);
@@ -130,13 +137,8 @@ public class MetricFactory {
         if (metric != null) {
             return metric;
         } else {
-            Aggregate forwardAggregate = metricRegistry.getAggregate(forwardCxt);
-            
-            ForwardingReservoir forwarding = null;
-            if(forwardAggregate != null) {
-                forwarding = new ForwardingReservoir();
-                forwarding.addReservoir(forwardAggregate);
-            }
+            ForwardingReservoir forwarding = createForward(forwardCxt);
+            forwarding = addAttachedContexts(cxt, forwarding);
             
             return createTimerInt(forwarding, cxt, type);
         }
@@ -147,21 +149,8 @@ public class MetricFactory {
 		if (metric != null) {
 			return metric;
 		} else {
-			Aggregate parentAggregate = null; // metricRegistry.getAggregate(monitoringContext.getParentContext());
-			
-			List<MonitoringContext> attachedContexts = monitoringContext.getAttachedContexts();
-			if (!attachedContexts.isEmpty()) {
-				ForwardingReservoir forwarding = new ForwardingReservoir();
-				forwarding.addReservoir(parentAggregate);
-				
-				for (MonitoringContext attachedContext : attachedContexts) {
-					Aggregate attachedAggregate = metricRegistry.getAggregate(attachedContext);
-					forwarding.addReservoir(attachedAggregate);
-				}
-				return createTimerInt(forwarding, monitoringContext, type);
-			} else {
-				return createTimerInt(parentAggregate, monitoringContext, type);
-			}
+		    ForwardingReservoir forwarding = addAttachedContexts(monitoringContext, null);
+		    return createTimerInt(forwarding, monitoringContext, type);
 		}
 	}
 	
@@ -184,12 +173,42 @@ public class MetricFactory {
         }
     }
 	
-	private Aggregate createAggregateInt(Aggregate parentAggregate, MonitoringContext context) {
+    private ForwardingReservoir createForward(MonitoringContext forwardCxt) {
+        Aggregate forwardAggregate = metricRegistry.getAggregate(forwardCxt);
+
+        ForwardingReservoir forwarding = null;
+        if (forwardAggregate != null) {
+            forwarding = new ForwardingReservoir();
+            forwarding.addReservoir(forwardAggregate);
+        }
+
+        return forwarding;
+    }
+
+    private ForwardingReservoir addAttachedContexts(MonitoringContext cxt,
+            ForwardingReservoir forwarding) {
+        List<MonitoringContext> attachedContexts = cxt.getAttachedContexts();
+        if (!attachedContexts.isEmpty()) {
+            if (forwarding == null) {
+                forwarding = new ForwardingReservoir();
+            }
+
+            for (MonitoringContext attachedContext : attachedContexts) {
+                Aggregate attachedAggregate = metricRegistry
+                        .getAggregate(attachedContext);
+                forwarding.addReservoir(attachedAggregate);
+            }
+        }
+
+        return forwarding;
+    }
+	
+	private Aggregate createAggregateInt(Reservoir forwardReservoir, MonitoringContext context) {
         Aggregate aggregate = null;
         if (!context.isEnabled()) {
             aggregate = NoSumAggregate.INSTANCE;
         } else {
-            aggregate = new SumAggregate(context, parentAggregate,
+            aggregate = new SumAggregate(context, forwardReservoir,
                     reservoirFactory.createAggregateReservoirContainer());
         }
         

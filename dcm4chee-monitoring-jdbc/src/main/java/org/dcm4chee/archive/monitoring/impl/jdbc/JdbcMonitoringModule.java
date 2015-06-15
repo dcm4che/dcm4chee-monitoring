@@ -78,4 +78,10 @@ public class JdbcMonitoringModule implements MonitoringModule {
     public String getName() {
         return MODULE_NAME;
     }
+    
+    public static enum LEVEL {
+        SERVICE,
+        SERVICE_INSTANCE,
+        STATEMENT_INSTANCE
+    }
 }

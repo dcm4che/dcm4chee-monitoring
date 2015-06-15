@@ -309,6 +309,11 @@ public class MonitoringContextNode implements MonitoringContext {
             this.metricEnabled = metricEnabled;
         }
     }
+    
+    @Override
+    public boolean isUndefined() {
+        return false;
+    }
 
     @Override
     public String toString() {

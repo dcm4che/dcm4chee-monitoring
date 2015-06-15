@@ -189,6 +189,8 @@ public class TimerTest {
 		
 
 		MonitoringContext subServiceCxt = contextProvider.getActiveInstanceContext().getOrCreateContext("subsystem1");
+		subServiceCxt.attachContext(serviceCxt);
+		
 		Timer subServiceTimer = metricFactory.timer(subServiceCxt);
 		Timer.Split subServiceTimerCxt = subServiceTimer.time();
 		try {
@@ -211,9 +213,11 @@ public class TimerTest {
 		metricFactory.sumAggregate(rootCxt);
 		
 		MonitoringContext serviceCxt = contextProvider.getActiveInstanceContext().getOrCreateContext("service1");
+		serviceCxt.attachContext(rootCxt);
 		metricFactory.sumAggregate(serviceCxt);
 		
 		MonitoringContext subServiceCxt1 = serviceCxt.getOrCreateContext("subsystem1");
+		subServiceCxt1.attachContext(serviceCxt);
 		Timer subServiceTimer1 = metricFactory.timer(subServiceCxt1);
 		Timer.Split subServiceTimerSplit1 = subServiceTimer1.time();
 		try {
@@ -223,6 +227,7 @@ public class TimerTest {
 		}
 		
 		MonitoringContext subServiceCxt2 = serviceCxt.getOrCreateContext("subsystem2");
+		subServiceCxt2.attachContext(serviceCxt);
 		Timer subServiceTimer2 = metricFactory.timer(subServiceCxt2);
 		Timer.Split subServiceTimerSplit2 = subServiceTimer2.time();
 		try {
@@ -252,10 +257,12 @@ public class TimerTest {
 		metricFactory.sumAggregate(rootCxt);
 		
 		MonitoringContext serviceCxt = contextProvider.getActiveInstanceContext().getOrCreateContext("service1");
+		serviceCxt.attachContext(rootCxt);
 		metricFactory.sumAggregate(serviceCxt);
 		
 		MonitoringContext subsystemCxt1 = serviceCxt.getOrCreateContext("subsystem1");
 		subsystemCxt1.attachContext(subsystemsContext);
+		subsystemCxt1.attachContext(serviceCxt);
 	
 		Timer subsystemTimer1 = metricFactory.timer(subsystemCxt1);
 		try (Timer.Split subsystemTimerSplit1 = subsystemTimer1.time() ) {
@@ -264,6 +271,7 @@ public class TimerTest {
 
 		MonitoringContext subsystemCxt2 = serviceCxt.getOrCreateContext("subsystem2");
 		subsystemCxt1.attachContext(subsystemsContext);
+		subsystemCxt2.attachContext(serviceCxt);
 		
 		Timer subsystemTimer2 = metricFactory.timer(subsystemCxt2);
 		try (Timer.Split subsystemTimerSplit2 = subsystemTimer2.time()) {

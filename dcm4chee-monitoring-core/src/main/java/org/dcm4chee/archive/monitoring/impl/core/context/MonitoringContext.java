@@ -50,6 +50,8 @@ import java.util.List;
 public interface MonitoringContext {
 
     String[] getPath();
+    
+    boolean isUndefined();
 
     MonitoringContext getParentContext();
 
