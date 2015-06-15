@@ -49,29 +49,29 @@ import org.dcm4chee.archive.monitoring.impl.core.reservoir.Reservoir;
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  *
  */
-public class AggregatableTimerImpl extends TimerImpl {
-	private final Reservoir reservoir;
+public class ForwardingTimerImpl extends TimerImpl {
+	private final Reservoir forwardReservoir;
 	
-	public AggregatableTimerImpl(MonitoringContext context, AggregatedReservoir aggregatedReservoir, Clock clock, Reservoir reservoir) {
+	public ForwardingTimerImpl(MonitoringContext context, AggregatedReservoir aggregatedReservoir, Clock clock, Reservoir forwardReservoir) {
 		super(context, aggregatedReservoir, clock);
-		this.reservoir = reservoir;
+		this.forwardReservoir = forwardReservoir;
 	}
 	
 	protected static class AggregatableTimerSplitImpl extends TimerImpl.TimerSplitImpl {
 		private final MonitoringContext context;
-		private final Reservoir reservoir;
+		private final Reservoir forwardReservoir;
 		
-		protected AggregatableTimerSplitImpl(MonitoringContext context, Reservoir reservoir, TimerImpl timer, Clock clock)
+		protected AggregatableTimerSplitImpl(MonitoringContext context, Reservoir forwardReservoir, TimerImpl timer, Clock clock)
 		{
 			super(timer, clock);
 			this.context = context;
-			this.reservoir = reservoir;
+			this.forwardReservoir = forwardReservoir;
 		}
 		
 		@Override
 		public long stop() {
 			long duration = super.stop();
-			reservoir.update(context, now, duration);
+			forwardReservoir.update(context, now, duration);
 			return duration;
 		}
 
@@ -79,7 +79,7 @@ public class AggregatableTimerImpl extends TimerImpl {
 	
 	@Override
 	protected Timer.Split newSplit() {
-		return new AggregatableTimerSplitImpl(context, reservoir, this, clock);
+		return new AggregatableTimerSplitImpl(context, forwardReservoir, this, clock);
 	}
 
 }

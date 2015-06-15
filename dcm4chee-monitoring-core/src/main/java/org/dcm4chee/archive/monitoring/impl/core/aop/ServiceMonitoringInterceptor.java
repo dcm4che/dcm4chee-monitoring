@@ -62,117 +62,117 @@ import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContextProvid
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  *
  */
-@MonitoringInterceptorType(scope=MonitoredScope.SERVICE)
-public class ServiceMonitoringInterceptor implements MonitoringInterceptor {
-    private static final String[] UNDEFINED_SERVICE = new String[] { "UNDEFINED" };
-	
-	@Inject @ApplicationMonitoringRegistry
-	private MetricProvider metricProvider;
-	
-	@Inject
-	private MetricAttributesProviderManager attributesProviderManager;
-	
-	private final AtomicInteger idGenerator = new AtomicInteger();
-	
-	private String createServiceInstanceId() {
-	    return Integer.toString(idGenerator.incrementAndGet());
-	}
-	
-	protected MonitoringContext getServiceMonitoringContextPath(MonitoringContextProvider cxtProvider, String[] serviceName, 
-	        InvocationContext context) {
-        if (serviceName != null && !Arrays.equals(serviceName, UNDEFINED_SERVICE)) {
-            return cxtProvider.getNodeContext().getOrCreateContext(serviceName);
-        } else {
-            String className = context.getMethod().getDeclaringClass().getSimpleName();
-            String methodName = context.getMethod().getName();
-            return cxtProvider.getNodeContext().getOrCreateContext(className, methodName);
-        }
-	}
-	
-	protected MonitoringContext getServiceInstanceMonitoringContextPath(MonitoringContext serviceCxt) {
-        return serviceCxt.getOrCreateContext(createServiceInstanceId());
-    }
-
-	/**
-	 * Indicates whether the method invocation should be monitored.
-	 * Default behavior always returns true.
-	 * This method can be overridden
-	 *
-	 * @param context Method invocation context
-	 * @return true to enable Simon, false either
-	 */
-	protected boolean isMonitored(InvocationContext context) {
-		return true;
-	}
-
-	/**
-	 * Around invoke method that measures the time of a service call
-	 *
-	 * @param context invocation context
-	 * @return return value from the invocation
-	 * @throws Exception exception thrown from the invocation
-	 */
-	@Override
-    public Object monitor(InvocationContext context) throws Exception {
-        if (isMonitored(context)) {
-            MonitoringContextProvider cxtProvider = metricProvider.getMonitoringContextProvider();
-
-            MonitoredService monitorAnnotation = context.getMethod().getAnnotation(MonitoredService.class);
-            MONITORING_SCOPE scope = monitorAnnotation.scope();
-            String[] serviceName = monitorAnnotation.name();
-            
-            Timer serviceTimer, serviceInstanceTimer = null;
-            switch(scope) {
-            case SERVICE:
-                // open service instance monitoring context
-                MonitoringContext serviceCxt = getServiceMonitoringContextPath(cxtProvider, serviceName, context);
-                serviceCxt = cxtProvider.createActiveStaticContext(serviceCxt);
-                serviceTimer = metricProvider.getMetricFactory().timer(serviceCxt);
-                break;
-            case SERVICE_INSTANCE: 
-                // open service instance monitoring context
-                serviceCxt = getServiceMonitoringContextPath(cxtProvider, serviceName, context);
-                serviceCxt = cxtProvider.createActiveStaticContext(serviceCxt);
-                // open service instance monitoring context
-                MonitoringContext instanceCxt = cxtProvider.createActiveInstanceContext(getServiceInstanceMonitoringContextPath(serviceCxt));
-                serviceTimer = metricProvider.getMetricFactory().timer(serviceCxt);
-                serviceInstanceTimer = metricProvider.getMetricFactory().timer(instanceCxt, Timer.TYPE.ONE_SHOT);
-                
-                MetricAttributesProvider metricAttributesProvider = attributesProviderManager.getAttributesProvider(serviceName);
-                if(metricAttributesProvider != null ) {
-                    serviceInstanceTimer.setAttributes(metricAttributesProvider.getMetricAttributes(context));
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown service scope " + scope);
-            }
-
-            Timer.Split serviceTimerSplit = null;
-            if(serviceTimer != null) {
-                serviceTimerSplit = serviceTimer.time();
-            }
-          
-            Timer.Split serviceInstanceTimerSplit = null;
-            if(serviceInstanceTimer != null) {
-               serviceInstanceTimerSplit = serviceInstanceTimer.time();
-            }
-            
-            try {
-                return context.proceed();
-            } finally {
-                if(serviceTimerSplit != null) {
-                    serviceTimerSplit.stop();
-                }
-                if(serviceInstanceTimerSplit != null) {
-                    serviceInstanceTimerSplit.stop();
-                }
-
-                // make sure service monitoring context gets disposed
-                cxtProvider.disposeAndFreeAllActiveContext();
-            }
-        } else {
-            return context.proceed();
-        }
-    }
-}
+//@MonitoringInterceptorType(scope=MonitoredScope.SERVICE)
+//public class ServiceMonitoringInterceptor implements MonitoringInterceptor {
+//    private static final String[] UNDEFINED_SERVICE = new String[] { "UNDEFINED" };
+//	
+//	@Inject @ApplicationMonitoringRegistry
+//	private MetricProvider metricProvider;
+//	
+//	@Inject
+//	private MetricAttributesProviderManager attributesProviderManager;
+//	
+//	private final AtomicInteger idGenerator = new AtomicInteger();
+//	
+//	private String createServiceInstanceId() {
+//	    return Integer.toString(idGenerator.incrementAndGet());
+//	}
+//	
+//	protected MonitoringContext getServiceMonitoringContextPath(MonitoringContextProvider cxtProvider, String[] serviceName, 
+//	        InvocationContext context) {
+//        if (serviceName != null && !Arrays.equals(serviceName, UNDEFINED_SERVICE)) {
+//            return cxtProvider.getNodeContext().getOrCreateContext(serviceName);
+//        } else {
+//            String className = context.getMethod().getDeclaringClass().getSimpleName();
+//            String methodName = context.getMethod().getName();
+//            return cxtProvider.getNodeContext().getOrCreateContext(className, methodName);
+//        }
+//	}
+//	
+//	protected MonitoringContext getServiceInstanceMonitoringContextPath(MonitoringContext serviceCxt) {
+//        return serviceCxt.getOrCreateContext(createServiceInstanceId());
+//    }
+//
+//	/**
+//	 * Indicates whether the method invocation should be monitored.
+//	 * Default behavior always returns true.
+//	 * This method can be overridden
+//	 *
+//	 * @param context Method invocation context
+//	 * @return true to enable Simon, false either
+//	 */
+//	protected boolean isMonitored(InvocationContext context) {
+//		return true;
+//	}
+//
+//	/**
+//	 * Around invoke method that measures the time of a service call
+//	 *
+//	 * @param context invocation context
+//	 * @return return value from the invocation
+//	 * @throws Exception exception thrown from the invocation
+//	 */
+//	@Override
+//    public Object monitor(InvocationContext context) throws Exception {
+//        if (isMonitored(context)) {
+//            MonitoringContextProvider cxtProvider = metricProvider.getMonitoringContextProvider();
+//
+//            MonitoredService monitorAnnotation = context.getMethod().getAnnotation(MonitoredService.class);
+//            MONITORING_SCOPE scope = monitorAnnotation.scope();
+//            String[] serviceName = monitorAnnotation.name();
+//            
+//            Timer serviceTimer, serviceInstanceTimer = null;
+//            switch(scope) {
+//            case SERVICE:
+//                // open service instance monitoring context
+//                MonitoringContext serviceCxt = getServiceMonitoringContextPath(cxtProvider, serviceName, context);
+//                serviceCxt = cxtProvider.createActiveStaticContext(serviceCxt);
+//                serviceTimer = metricProvider.getMetricFactory().timer(serviceCxt);
+//                break;
+//            case SERVICE_INSTANCE: 
+//                // open service instance monitoring context
+//                serviceCxt = getServiceMonitoringContextPath(cxtProvider, serviceName, context);
+//                serviceCxt = cxtProvider.createActiveStaticContext(serviceCxt);
+//                // open service instance monitoring context
+//                MonitoringContext instanceCxt = cxtProvider.createActiveInstanceContext(getServiceInstanceMonitoringContextPath(serviceCxt));
+//                serviceTimer = metricProvider.getMetricFactory().timer(serviceCxt);
+//                serviceInstanceTimer = metricProvider.getMetricFactory().timer(instanceCxt, Timer.TYPE.ONE_SHOT);
+//                
+//                MetricAttributesProvider metricAttributesProvider = attributesProviderManager.getAttributesProvider(serviceName);
+//                if(metricAttributesProvider != null ) {
+//                    serviceInstanceTimer.setAttributes(metricAttributesProvider.getMetricAttributes(context));
+//                }
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Unknown service scope " + scope);
+//            }
+//
+//            Timer.Split serviceTimerSplit = null;
+//            if(serviceTimer != null) {
+//                serviceTimerSplit = serviceTimer.time();
+//            }
+//          
+//            Timer.Split serviceInstanceTimerSplit = null;
+//            if(serviceInstanceTimer != null) {
+//               serviceInstanceTimerSplit = serviceInstanceTimer.time();
+//            }
+//            
+//            try {
+//                return context.proceed();
+//            } finally {
+//                if(serviceTimerSplit != null) {
+//                    serviceTimerSplit.stop();
+//                }
+//                if(serviceInstanceTimerSplit != null) {
+//                    serviceInstanceTimerSplit.stop();
+//                }
+//
+//                // make sure service monitoring context gets disposed
+//                cxtProvider.disposeAndFreeAllActiveContext();
+//            }
+//        } else {
+//            return context.proceed();
+//        }
+//    }
+//}
 

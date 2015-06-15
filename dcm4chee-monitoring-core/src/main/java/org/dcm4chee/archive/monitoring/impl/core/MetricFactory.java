@@ -43,6 +43,7 @@ import java.util.List;
 
 import org.dcm4chee.archive.monitoring.impl.core.Meter.TYPE;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.Aggregate;
+import org.dcm4chee.archive.monitoring.impl.core.aggregate.SimpleAggregate;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.SumAggregate;
 import org.dcm4chee.archive.monitoring.impl.core.clocks.Clock;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
@@ -76,6 +77,20 @@ public class MetricFactory {
 		return null;
 	}
 	
+	public Aggregate simpleAggregate(MonitoringContext cxt) {
+        final Aggregate metric = metricRegistry.getMetric(Aggregate.class, cxt);
+        if (metric != null) {
+            return metric;
+        } else {
+            Aggregate aggregate = new SimpleAggregate(cxt.getPath(), 
+                    reservoirFactory.createAggregateReservoirContainer());
+            
+            metricRegistry.register(cxt, aggregate);
+            
+            return aggregate;
+        }
+    }
+	
 	public Aggregate sumAggregate(MonitoringContext monitoringContext) {
 		final Aggregate metric = metricRegistry.getMetric(Aggregate.class, monitoringContext);
 		if (metric != null) {
@@ -90,12 +105,49 @@ public class MetricFactory {
 		return timer(monitoringContext, Timer.TYPE.DEFAULT);
 	}
 	
+	public Timer timerOnlyForward(MonitoringContext cxt, MonitoringContext forwardCxt) {
+	    final Timer metric = metricRegistry.getMetric(Timer.class, cxt);
+        if (metric != null) {
+            return metric;
+        } else {
+            Aggregate forwardAggregate = metricRegistry.getAggregate(forwardCxt);
+            
+            ForwardingReservoir forwarding = null;
+            if(forwardAggregate != null) {
+                forwarding = new ForwardingReservoir();
+                forwarding.addReservoir(forwardAggregate);
+            }
+            
+            Timer t = new ForwardOnlyTimer(cxt, forwarding, clock);
+            metricRegistry.register(cxt, t);
+            return t;
+        }
+
+	}
+	
+	public Timer timerWithForward(MonitoringContext cxt, Timer.TYPE type, MonitoringContext forwardCxt) {
+	    final Timer metric = metricRegistry.getMetric(Timer.class, cxt);
+        if (metric != null) {
+            return metric;
+        } else {
+            Aggregate forwardAggregate = metricRegistry.getAggregate(forwardCxt);
+            
+            ForwardingReservoir forwarding = null;
+            if(forwardAggregate != null) {
+                forwarding = new ForwardingReservoir();
+                forwarding.addReservoir(forwardAggregate);
+            }
+            
+            return createTimerInt(forwarding, cxt, type);
+        }
+    }
+	
 	public Timer timer(MonitoringContext monitoringContext, Timer.TYPE type) {
 		final Timer metric = metricRegistry.getMetric(Timer.class, monitoringContext);
 		if (metric != null) {
 			return metric;
 		} else {
-			Aggregate parentAggregate = metricRegistry.getAggregate(monitoringContext.getParentContext());
+			Aggregate parentAggregate = null; // metricRegistry.getAggregate(monitoringContext.getParentContext());
 			
 			List<MonitoringContext> attachedContexts = monitoringContext.getAttachedContexts();
 			if (!attachedContexts.isEmpty()) {
@@ -146,15 +198,15 @@ public class MetricFactory {
         return aggregate;
 	}
 	
-	private Timer createTimerInt(Reservoir reservoir, MonitoringContext context, Timer.TYPE type) {
+	private Timer createTimerInt(Reservoir forwardReservoir, MonitoringContext context, Timer.TYPE type) {
 	    Timer timer = null;
 	    if(!context.isEnabled()) {
 	        timer = NoTimer.INSTANCE;
 	    } else {
-            if (reservoir != null) {
-                timer = new AggregatableTimerImpl(context,
+            if (forwardReservoir != null) {
+                timer = new ForwardingTimerImpl(context,
                         reservoirFactory.createTimerReservoirContainer(type),
-                        clock, reservoir);
+                        clock, forwardReservoir);
             } else {
                 timer = new TimerImpl(context,
                         reservoirFactory.createTimerReservoirContainer(type),
