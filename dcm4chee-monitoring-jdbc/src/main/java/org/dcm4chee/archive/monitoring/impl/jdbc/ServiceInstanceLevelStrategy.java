@@ -37,32 +37,20 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.monitoring.impl.core.module;
+package org.dcm4chee.archive.monitoring.impl.jdbc;
 
-import org.dcm4chee.archive.monitoring.impl.config.ModuleConfiguration;
+import org.dcm4chee.archive.monitoring.impl.core.Timer;
+import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
 
-
-public class DummyModuleA implements MonitoringModule {
-
-    @Override
-    public String getName() {
-        return DummyModuleA.class.getSimpleName();
-    }
-
-    @Override
-    public void start() {
-        
-    }
-
-
-    @Override
-    public void stop() {
-        
-    }
-
-    @Override
-    public void setConfiguration(ModuleConfiguration cfg) {
-        //NOOP
+/**
+ * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
+ *
+ */
+public class ServiceInstanceLevelStrategy extends StatementInstanceLevelStrategy {
+    
+    public Timer createTimerForStatement(MonitoringContext statementCxt) {
+        MonitoringContext fwCxt = statementCxt.getParentContext().getParentContext().getParentContext();
+        return getMetricFactory().timerOnlyForward(statementCxt, fwCxt);
     }
     
 }

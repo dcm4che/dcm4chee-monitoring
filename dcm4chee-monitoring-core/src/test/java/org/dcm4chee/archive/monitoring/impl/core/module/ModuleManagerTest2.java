@@ -75,8 +75,8 @@ public class ModuleManagerTest2 {
 	
 	@Test
     public void testNoModulesToStart() {
-        Assert.assertFalse(moduleManager.startModule("DummyModuleA"));
-        Assert.assertFalse(moduleManager.startModule("DummyModuleB"));
+        Assert.assertFalse(moduleManager.startModule("DummyModuleA", null));
+        Assert.assertFalse(moduleManager.startModule("DummyModuleB", null));
     }
 	
 }

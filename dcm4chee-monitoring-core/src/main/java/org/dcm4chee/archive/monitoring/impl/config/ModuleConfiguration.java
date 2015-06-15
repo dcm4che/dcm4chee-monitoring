@@ -46,6 +46,7 @@ package org.dcm4chee.archive.monitoring.impl.config;
 public class ModuleConfiguration {
     private String moduleName;
     private boolean enabled;
+    private String level;
     
     public String getModuleName() {
         return moduleName;
@@ -59,5 +60,12 @@ public class ModuleConfiguration {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
-       
+    
+    public String getLevel() {
+        return level;
+    }
+    public void setLevel(String level) {
+        this.level = level;
+    }
+    
 }

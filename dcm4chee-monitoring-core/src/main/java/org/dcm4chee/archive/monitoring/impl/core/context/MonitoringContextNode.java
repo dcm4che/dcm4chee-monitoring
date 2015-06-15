@@ -62,6 +62,7 @@ public class MonitoringContextNode implements MonitoringContext {
 	protected List<MonitoringContextNode> children = Collections.emptyList();
 	private List<MonitoringContext> attachedContexts = Collections.emptyList();
 	
+	private boolean externallyDisposed;
 	private boolean disposed;
 	
 	private boolean metricEnabled;
@@ -226,6 +227,7 @@ public class MonitoringContextNode implements MonitoringContext {
             if (DISPOSAL_CONTEXT.CONSUME.equals(disposalCxt)) {
                 metricContainer.markConsumed(now);
             } else if (DISPOSAL_CONTEXT.EXTERNAL.equals(disposalCxt)) {
+                externallyDisposed = true;
                 metricContainer.markExternallyDisposed(now);
             }
 
@@ -234,8 +236,16 @@ public class MonitoringContextNode implements MonitoringContext {
             }
 
             metricContainer = null;
+        } else {
+            if (DISPOSAL_CONTEXT.EXTERNAL.equals(disposalCxt)) {
+                externallyDisposed = true;
+            }
         }
 
+        if(!externallyDisposed) {
+            return;
+        }
+        
         disposed = true;
 
         if (children.isEmpty()) {

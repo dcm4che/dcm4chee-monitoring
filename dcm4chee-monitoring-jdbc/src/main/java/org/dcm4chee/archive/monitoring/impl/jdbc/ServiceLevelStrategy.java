@@ -37,32 +37,31 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.monitoring.impl.core.module;
+package org.dcm4chee.archive.monitoring.impl.jdbc;
 
-import org.dcm4chee.archive.monitoring.impl.config.ModuleConfiguration;
+import java.sql.Connection;
 
+import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
 
-public class DummyModuleA implements MonitoringModule {
-
-    @Override
-    public String getName() {
-        return DummyModuleA.class.getSimpleName();
-    }
-
-    @Override
-    public void start() {
+/**
+ * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
+ *
+ */
+public class ServiceLevelStrategy extends ServiceInstanceLevelStrategy {
+    
+    public MonitoringContext initConnectionContextOnStatementCreation(Connection connection) {
+        MonitoringContext serviceInstanceCxt = getContextProvider().getActiveInstanceContext();
+        if(!serviceInstanceCxt.isUndefined()) {
+            MonitoringContext serviceCxt = serviceInstanceCxt.getParentContext();
+            
+            MonitoringContext serviceConnectionCxt = serviceCxt.getOrCreateContext(CONNECTION);
+            getMetricFactory().sumAggregate(serviceConnectionCxt);
+                    
+            MonitoringContext serviceInstanceConnectionCxt = serviceInstanceCxt.getOrCreateContext(CONNECTION);
+            getMetricFactory().forwardAggregate(serviceInstanceConnectionCxt, serviceConnectionCxt); 
+        }
         
-    }
-
-
-    @Override
-    public void stop() {
-        
-    }
-
-    @Override
-    public void setConfiguration(ModuleConfiguration cfg) {
-        //NOOP
+        return serviceInstanceCxt.getOrCreateInstanceContext(connection, CONNECTION);
     }
     
 }

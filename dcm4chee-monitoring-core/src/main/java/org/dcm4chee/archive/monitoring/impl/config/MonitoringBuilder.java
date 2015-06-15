@@ -148,7 +148,7 @@ public class MonitoringBuilder {
             for (ModuleConfiguration moduleCfg : cfg.getModuleConfigurations()) {
                 if (moduleCfg.isEnabled()) {
                     String moduleName = moduleCfg.getModuleName();
-                    boolean started = moduleManager.startModule(moduleName);
+                    boolean started = moduleManager.startModule(moduleName, moduleCfg);
                     if(started) {
                         LOGGER.info("Started monitoring module: " +  moduleName);
                     } else {

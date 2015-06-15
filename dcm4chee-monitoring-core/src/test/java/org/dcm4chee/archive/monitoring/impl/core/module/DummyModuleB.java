@@ -39,6 +39,8 @@
 
 package org.dcm4chee.archive.monitoring.impl.core.module;
 
+import org.dcm4chee.archive.monitoring.impl.config.ModuleConfiguration;
+
 
 public class DummyModuleB implements MonitoringModule {
 
@@ -56,6 +58,11 @@ public class DummyModuleB implements MonitoringModule {
     @Override
     public void stop() {
         
+    }
+
+    @Override
+    public void setConfiguration(ModuleConfiguration cfg) {
+        //NOOP
     }
     
 }

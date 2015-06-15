@@ -37,32 +37,40 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.monitoring.impl.core.module;
+package org.dcm4chee.archive.monitoring.impl.jdbc;
 
-import org.dcm4chee.archive.monitoring.impl.config.ModuleConfiguration;
+import java.sql.Connection;
 
+import org.dcm4chee.archive.monitoring.impl.core.MetricFactory;
+import org.dcm4chee.archive.monitoring.impl.core.MetricProvider;
+import org.dcm4chee.archive.monitoring.impl.core.Timer;
+import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
+import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContextProvider;
 
-public class DummyModuleA implements MonitoringModule {
+/**
+ * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
+ *
+ */
+public abstract class AbstractLevelStrategy {
+    protected static final String CONNECTION = "connection";
 
-    @Override
-    public String getName() {
-        return DummyModuleA.class.getSimpleName();
+    // JdbcWrapper is initialized by server before monitoring is configured (and
+    // MetricProvider is created)
+    // => ensure to access MetricProvider lazy
+    protected static MetricFactory getMetricFactory() {
+        return MetricProvider.getInstance().getMetricFactory();
     }
 
-    @Override
-    public void start() {
-        
+    // JdbcWrapper is initialized by server before monitoring is configured (and
+    // MetricProvider is created)
+    // => ensure to access MetricProvider lazy
+    protected static MonitoringContextProvider getContextProvider() {
+        return MetricProvider.getInstance().getMonitoringContextProvider();
     }
-
-
-    @Override
-    public void stop() {
-        
-    }
-
-    @Override
-    public void setConfiguration(ModuleConfiguration cfg) {
-        //NOOP
-    }
+    
+    public abstract MonitoringContext initConnectionContextOnStatementCreation(Connection connection);
+    
+    public abstract Timer createTimerForStatement(MonitoringContext statementCxt);
+    
     
 }

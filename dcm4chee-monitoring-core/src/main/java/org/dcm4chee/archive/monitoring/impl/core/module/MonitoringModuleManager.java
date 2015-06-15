@@ -45,6 +45,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
+import org.dcm4chee.archive.monitoring.impl.config.ModuleConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,9 +60,9 @@ public class MonitoringModuleManager {
     @Inject
     private Instance<MonitoringModule> modules;
     
-    public boolean startModule(String name) {
+    public boolean startModule(String name, ModuleConfiguration cfg) {
         MonitoringModule module = getModule(name);
-        return (module != null) ? startModule(module) : false;
+        return (module != null) ? startModule(module, cfg) : false;
     }
     
     private MonitoringModule getModule(String name) {
@@ -74,19 +75,14 @@ public class MonitoringModuleManager {
         return null;
     }
     
-    private boolean startModule(MonitoringModule module) {
+    private boolean startModule(MonitoringModule module, ModuleConfiguration cfg) {
         try {
+            module.setConfiguration(cfg);
             module.start();
             return true;
         } catch(Exception e ) {
             LOGGER.error(format("Error while starting monitoring module %s", module.getName()), e);
             return false;
-        }
-    }
-    
-    public void startModules() {
-        for(MonitoringModule module : modules) {
-            startModule(module);
         }
     }
     

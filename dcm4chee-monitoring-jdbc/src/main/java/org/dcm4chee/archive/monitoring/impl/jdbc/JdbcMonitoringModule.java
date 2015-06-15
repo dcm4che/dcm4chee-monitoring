@@ -41,6 +41,7 @@ package org.dcm4chee.archive.monitoring.impl.jdbc;
 
 import javax.servlet.ServletContext;
 
+import org.dcm4chee.archive.monitoring.impl.config.ModuleConfiguration;
 import org.dcm4chee.archive.monitoring.impl.core.module.MonitoringModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,8 @@ public class JdbcMonitoringModule implements MonitoringModule {
     
     private static final String MODULE_NAME = "jdbc";
     
+    private ModuleConfiguration cfg;
+    
     @Override
     public void start() {
         ServletContext servletContext = MonitoringContextListener.getServletContext();
@@ -63,9 +66,33 @@ public class JdbcMonitoringModule implements MonitoringModule {
         }
         
         JdbcWrapper jdbcWrapper = JdbcWrapper.SINGLETON;
+        
+        String levelString = cfg.getLevel();
+        LEVEL level = JdbcMonitoringModule.LEVEL.valueOf(levelString);
+        AbstractLevelStrategy strategy = null;
+        switch(level) {
+        case SERVICE:
+            strategy = new ServiceLevelStrategy();
+            break;
+        case SERVICE_INSTANCE:
+            strategy = new ServiceInstanceLevelStrategy();
+            break;
+        case STATEMENT_INSTANCE:
+            strategy = new StatementInstanceLevelStrategy();
+            break;
+        default:
+            break;
+        }
+        
+        jdbcWrapper.setLevelStrategy(strategy);
+        
         jdbcWrapper.initServletContext(servletContext);
         
         jdbcWrapper.rebindDataSources();
+    }
+    
+    public void setConfiguration(ModuleConfiguration cfg) {
+        this.cfg = cfg;
     }
     
     @Override

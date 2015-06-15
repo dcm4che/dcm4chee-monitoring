@@ -43,6 +43,7 @@ import java.util.List;
 
 import org.dcm4chee.archive.monitoring.impl.core.Meter.TYPE;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.Aggregate;
+import org.dcm4chee.archive.monitoring.impl.core.aggregate.ForwardOnlyAggregate;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.SimpleAggregate;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.SumAggregate;
 import org.dcm4chee.archive.monitoring.impl.core.clocks.Clock;
@@ -90,6 +91,19 @@ public class MetricFactory {
             return aggregate;
         }
     }
+	
+	public Aggregate forwardAggregate(MonitoringContext cxt, MonitoringContext forwardCxt) {
+	    final Aggregate metric = metricRegistry.getMetric(Aggregate.class, cxt);
+        if (metric != null) {
+            return metric;
+        } else {
+            ForwardingReservoir forwarding = createForward(forwardCxt);
+            forwarding = addAttachedContexts(cxt, forwarding);
+            Aggregate created = new ForwardOnlyAggregate(forwarding);
+            metricRegistry.register(cxt, created);
+            return created;
+        }
+	}
 	
 	public Aggregate sumAggregate(MonitoringContext monitoringContext) {
 		final Aggregate metric = metricRegistry.getMetric(Aggregate.class, monitoringContext);

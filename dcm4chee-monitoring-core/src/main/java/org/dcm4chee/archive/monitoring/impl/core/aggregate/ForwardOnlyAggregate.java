@@ -37,32 +37,40 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.monitoring.impl.core.module;
+package org.dcm4chee.archive.monitoring.impl.core.aggregate;
 
-import org.dcm4chee.archive.monitoring.impl.config.ModuleConfiguration;
+import java.util.Collections;
+import java.util.List;
 
+import org.dcm4chee.archive.monitoring.impl.core.AbstractMetric;
+import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
+import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoirSnapshot;
+import org.dcm4chee.archive.monitoring.impl.core.reservoir.Reservoir;
 
-public class DummyModuleA implements MonitoringModule {
-
-    @Override
-    public String getName() {
-        return DummyModuleA.class.getSimpleName();
-    }
-
-    @Override
-    public void start() {
-        
-    }
-
-
-    @Override
-    public void stop() {
-        
-    }
-
-    @Override
-    public void setConfiguration(ModuleConfiguration cfg) {
-        //NOOP
+/**
+ * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
+ *
+ */
+public class ForwardOnlyAggregate extends AbstractMetric implements Aggregate {
+    private final Reservoir forwardReservoir;
+    
+    public ForwardOnlyAggregate(Reservoir forwardReservoir) {
+        this.forwardReservoir = forwardReservoir;
     }
     
+    @Override
+    public AggregateSnapshot getSnapshot() {
+        return null;
+    }
+
+    @Override
+    public void update(MonitoringContext context, long now, long value) {
+        forwardReservoir.update(context, now, value);
+    }
+
+    @Override
+    public List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution) {
+        return Collections.emptyList();
+    }
+
 }

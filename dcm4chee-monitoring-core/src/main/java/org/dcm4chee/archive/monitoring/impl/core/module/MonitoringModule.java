@@ -39,6 +39,8 @@
 
 package org.dcm4chee.archive.monitoring.impl.core.module;
 
+import org.dcm4chee.archive.monitoring.impl.config.ModuleConfiguration;
+
 /**
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  *
@@ -46,6 +48,8 @@ package org.dcm4chee.archive.monitoring.impl.core.module;
 public interface MonitoringModule {
 
     String getName();
+    
+    void setConfiguration(ModuleConfiguration cfg);
     
     void start();
     

@@ -31,8 +31,7 @@ public final class JdbcWrapper {
 	private static final String[] USED_CONNECTIONS_CXT = new String[] { "jdbc", "connections", "used" };
 	private static final String[] ACTIVE_CONNECTIONS_CXT = new String[] { "jdbc", "connections", "active" };
 	
-	private static final String[] JDBC_CONNECTIONS = new String[] { "jdbc", "connections" };
-	private static final String CONNECTION = "connection";
+//	private static final String[] JDBC_CONNECTIONS = new String[] { "jdbc", "connections" };
 	private static final String STATEMENT = "statement";
 
 	private static final String PREPARE_STATEMENT_METHOD_NAME = "prepareStatement";
@@ -50,6 +49,8 @@ public final class JdbcWrapper {
 
 	private ServletContext servletContext;
 	private boolean connectionInformationsEnabled;
+	
+	private AbstractLevelStrategy levelStrategy;
 	
 	// JdbcWrapper is initialized by server before monitoring is configured (and MetricProvider is created) 
 	// => ensure to access MetricProvider lazy 
@@ -71,10 +72,10 @@ public final class JdbcWrapper {
 		private StatementInvocationHandler(String query, Statement statement, MonitoringContext parentMonitoringContext) {
 			this.requestName = query;
 			this.statement = statement;
-			initMonitoringContext(parentMonitoringContext);
+			initStatementMonitoringContext(parentMonitoringContext);
 		}
 		
-		private void initMonitoringContext(MonitoringContext parentMonitoringContext) {
+		private void initStatementMonitoringContext(MonitoringContext parentMonitoringContext) {
 			this.monitoringContext = parentMonitoringContext.getOrCreateInstanceContext(statement, STATEMENT);
 		}
 
@@ -117,13 +118,13 @@ public final class JdbcWrapper {
 			this.connection = connection;
 		}
 		
-		private MonitoringContext initMonitoringContext() {
-			return getContextProvider().getActiveInstanceContext().getOrCreateInstanceContext(connection, CONNECTION);
+		private MonitoringContext initConnectionContextOnStatementCreation() {
+		    return levelStrategy.initConnectionContextOnStatementCreation(connection);
 		}
 
-		private void init() {
-			MonitoringContext context = getContextProvider().getNodeContext().getOrCreateInstanceContext(connection, JDBC_CONNECTIONS);
-			getMetricFactory().register(context, new ConnectionInformation());
+		private void initConnection() {
+//			MonitoringContext context = getContextProvider().getNodeContext().getOrCreateInstanceContext(connection, JDBC_CONNECTIONS);
+//			getMetricFactory().register(context, new ConnectionInformation());
 			
 			incUsedConnectionCounter();
 		}
@@ -155,7 +156,7 @@ public final class JdbcWrapper {
 					} else {
 						requestName = null;
 					}
-					MonitoringContext cxt = initMonitoringContext();
+					MonitoringContext cxt = initConnectionContextOnStatementCreation();
 					result = createStatementProxy(requestName, (Statement) result, cxt);
 				}
 				return result;
@@ -163,8 +164,8 @@ public final class JdbcWrapper {
 				if (CLOSE_METHOD_NAME.equals(methodName) && !alreadyClosed) {
 					decUsedConnectionCounter();
 					
-					MonitoringContext context = getContextProvider().getNodeContext().getOrCreateInstanceContext(connection, JDBC_CONNECTIONS);
-					context.dispose();
+//					MonitoringContext context = getContextProvider().getNodeContext().getOrCreateInstanceContext(connection, JDBC_CONNECTIONS);
+//					context.dispose();
 					alreadyClosed = true;
 				}
 			}
@@ -260,6 +261,10 @@ public final class JdbcWrapper {
 			
 		connectionInformationsEnabled = Parameters.isSystemActionsEnabled();
 	}
+	
+	void setLevelStrategy(AbstractLevelStrategy levelStrategy) {
+	    this.levelStrategy = levelStrategy;
+	}
 
 	boolean isConnectionInformationsEnabled() {
 		return connectionInformationsEnabled;
@@ -277,7 +282,8 @@ public final class JdbcWrapper {
 		}
 
 //		boolean systemError = true;
-		Timer.Split timerSplit = getMetricFactory().timer(statementMonitoringContext, Timer.TYPE.ONE_SHOT).time();
+		
+		Timer.Split timerSplit = levelStrategy.createTimerForStatement(statementMonitoringContext).time();
 		try {
 			incActiveConnectionCounter();
 			
@@ -419,7 +425,7 @@ public final class JdbcWrapper {
 		final Connection result = createProxy(connection, invocationHandler);
 		
 		if (result != connection) { // NOPMD
-			invocationHandler.init();
+			invocationHandler.initConnection();
 		}
 		return result;
 	}

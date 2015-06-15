@@ -221,8 +221,10 @@ public class MonitoringRS {
 					Timer timer = (Timer)metric;
 					if(timeSpec == TimeSpec.ALL) {
 						AggregatedReservoirSnapshot snapshot = timer.getSnapshot();
-						TimerResponse timerResponse = TimerResponse.create(snapshot, timeUnit);
-						metricResponse.addTimer(timerResponse);
+						if( snapshot != null) {
+						    TimerResponse timerResponse = TimerResponse.create(snapshot, timeUnit);
+	                        metricResponse.addTimer(timerResponse);
+						}
 					} else {
 						List<AggregatedReservoirSnapshot> snapshots = timer.getSnapshots(timeSpec.getStart(), timeSpec.getEnd(), timeSpec.getResolution());
 						for (AggregatedReservoirSnapshot snapshot : snapshots) {
@@ -234,8 +236,10 @@ public class MonitoringRS {
 					Counter counter = (Counter)metric;
 					if(timeSpec == TimeSpec.ALL) {
 						AggregatedReservoirSnapshot snapshot = counter.getSnapshot();
-						CounterResponse counterResponse = CounterResponse.create(snapshot);
-						metricResponse.addCounter(counterResponse);
+						if(snapshot != null) {
+						    CounterResponse counterResponse = CounterResponse.create(snapshot);
+	                        metricResponse.addCounter(counterResponse);
+						}
 					} else {
 //						List<AggregatedReservoirSnapshot> snapshots = counter.getSnapshots(timeSpec.getStart(), timeSpec.getEnd(), timeSpec.getResolution());
 //						for (AggregatedReservoirSnapshot snapshot : snapshots) {
@@ -247,8 +251,10 @@ public class MonitoringRS {
 					Aggregate aggregate = (Aggregate)metric;
 					if(timeSpec == TimeSpec.ALL) {
 						AggregateSnapshot snapshot = aggregate.getSnapshot();
-						AggregateTimerResponse aggregateResponse = AggregateTimerResponse.create(snapshot, timeUnit);
-						metricResponse.addAggregate(aggregateResponse);
+						if(snapshot != null) {
+						    AggregateTimerResponse aggregateResponse = AggregateTimerResponse.create(snapshot, timeUnit);
+	                        metricResponse.addAggregate(aggregateResponse);
+						}
 					} else {
 						List<AggregatedReservoirSnapshot> snapshots = aggregate.getSnapshots(timeSpec.getStart(), timeSpec.getEnd(), timeSpec.getResolution());
 						for (AggregatedReservoirSnapshot snapshot : snapshots) {
