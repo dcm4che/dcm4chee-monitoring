@@ -122,11 +122,22 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>www.dcm4che.org</id>
+      <name>dcm4che Repository</name>
+      <url>scp://www.dcm4che.org:443/home/maven2</url>
+    </repository>
+  </distributionManagement>
   <repositories>
     <repository>
       <id>www.dcm4che.org</id>
       <name>dcm4che Repository</name>
       <url>http://www.dcm4che.org/maven2</url>
+    </repository>
+    <repository>
+      <id>jboss</id>
+      <url>http://repository.jboss.org/nexus/content/groups/public</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -137,6 +148,13 @@
     </pluginRepository>
   </pluginRepositories>
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>2.9</version>
+      </extension>
+    </extensions>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -158,4 +176,18 @@
     <module>dcm4chee-monitoring-provider</module>
     <!--<module>dcm4chee-arc-monitoring-ear</module>-->
   </modules>
+  <profiles>
+    <profile>
+      <id>csp</id>
+      <properties>
+        <hap-repository.url/>
+      </properties>
+      <distributionManagement>
+        <repository>
+          <id>hap-repository</id>
+          <url>${hap-repository.url}</url>
+        </repository>
+      </distributionManagement>
+    </profile>
+  </profiles>
 </project>
