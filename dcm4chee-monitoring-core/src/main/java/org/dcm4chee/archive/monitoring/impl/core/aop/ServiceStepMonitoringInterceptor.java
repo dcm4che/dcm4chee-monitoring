@@ -101,7 +101,7 @@ public class ServiceStepMonitoringInterceptor implements MonitoringInterceptor {
 		    MonitoringContextProvider cxtProvider = metricProvider.getMonitoringContextProvider();
 		    
 		    Monitored monitorAnnotation = context.getMethod().getAnnotation(Monitored.class);
-            SERVICE_MONITORING_LEVEL scope = monitorAnnotation.level();
+            SERVICE_MONITORING_LEVEL level = monitorAnnotation.level();
             String[] stepName = monitorAnnotation.name();
             
             MonitoringContext serviceInstanceCxt = cxtProvider.getActiveInstanceContext();
@@ -116,7 +116,7 @@ public class ServiceStepMonitoringInterceptor implements MonitoringInterceptor {
             
             Timer timer;
             
-            switch(scope) {
+            switch(level) {
             case SERVICE:
                 timer = metricProvider.getMetricFactory().timerOnlyForward(stepInstanceCxt, stepCxt);
                 break;
@@ -129,7 +129,7 @@ public class ServiceStepMonitoringInterceptor implements MonitoringInterceptor {
                 }
                 break;
             default:
-                throw new IllegalArgumentException("Unknown service scope " + scope);
+                throw new IllegalArgumentException("Unknown monitoring level " + level);
             }
 			
             Timer.Split split = timer.time();
