@@ -174,7 +174,7 @@
     <module>dcm4chee-monitoring-jdbc</module>
     <module>dcm4chee-monitoring-rs</module>
     <module>dcm4chee-monitoring-provider</module>
-    <module>dcm4chee-arc-monitoring-ear</module>
+    <!--<module>dcm4chee-arc-monitoring-ear</module>-->
   </modules>
   <profiles>
     <profile>
