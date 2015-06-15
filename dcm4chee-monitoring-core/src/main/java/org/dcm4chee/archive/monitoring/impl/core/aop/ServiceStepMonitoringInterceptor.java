@@ -44,7 +44,7 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.interceptor.InvocationContext;
 
-import org.dcm4chee.archive.monitoring.api.MONITORING_SCOPE;
+import org.dcm4chee.archive.monitoring.api.SERVICE_MONITORING_LEVEL;
 import org.dcm4chee.archive.monitoring.api.MetricAttributesProvider;
 import org.dcm4chee.archive.monitoring.api.Monitored;
 import org.dcm4chee.archive.monitoring.api.aop.MonitoredScope;
@@ -62,95 +62,86 @@ import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContextProvid
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  *
  */
-//@MonitoringInterceptorType(scope=MonitoredScope.SERVICE_STEP)
-//public class ServiceStepMonitoringInterceptor implements MonitoringInterceptor {
-//    private static final String[] UNDEFINED_SERVICE = new String[] { "UNDEFINED" };
-//    
-//	@Inject @ApplicationMonitoringRegistry
-//	private MetricProvider metricProvider;
-//	
-//	@Inject
-//    private MetricAttributesProviderManager attributesProviderManager;
-//	
-//	protected MonitoringContext getServiceMonitoringContextPath(MonitoringContextProvider cxtProvider, boolean instance, String[] serviceName, 
-//            InvocationContext context) {
-//        if (serviceName != null && !Arrays.equals(serviceName, UNDEFINED_SERVICE)) {
-//            return cxtProvider.getActiveContext(instance).getOrCreateContext(serviceName);
-//        } else {
-//            String className = context.getMethod().getDeclaringClass().getSimpleName();
-//            String methodName = context.getMethod().getName();
-//            return cxtProvider.getActiveContext(instance).getOrCreateContext(className, methodName);
-//        }
-//    }
-//
-//	/**
-//	 * Indicates whether the method invocation should be monitored.
-//	 * Default behavior always returns true.
-//	 * This method can be overridden
-//	 *
-//	 * @param context Method invocation context
-//	 * @return true to enable Simon, false either
-//	 */
-//	protected boolean isMonitored(InvocationContext context) {
-//		return true;
-//	}
-//
-//	@Override
-//	public Object monitor(InvocationContext context) throws Exception {
-//		if (isMonitored(context)) {
-//		    MonitoringContextProvider cxtProvider = metricProvider.getMonitoringContextProvider();
-//		    
-//		    Monitored monitorAnnotation = context.getMethod().getAnnotation(Monitored.class);
-//            MONITORING_SCOPE scope = monitorAnnotation.scope();
-//            String[] stepName = monitorAnnotation.name();
-//            
-//            Timer stepTimer, stepInstanceTimer = null;
-//            switch(scope) {
-//            case SERVICE:
-//                // open service instance monitoring context
-//                MonitoringContext stepCxt = getServiceMonitoringContextPath(cxtProvider, false, stepName, context);
-//                stepTimer = metricProvider.getMetricFactory().timer(stepCxt);
-//                break;
-//            case SERVICE_INSTANCE: 
-//                // open service instance monitoring context
-//                stepCxt = getServiceMonitoringContextPath(cxtProvider, false, stepName, context);
-//                // open service instance monitoring context
-//                MonitoringContext instanceCxt = getServiceMonitoringContextPath(cxtProvider, true, stepName, context);
-//                stepTimer = metricProvider.getMetricFactory().timer(stepCxt);
-//                stepInstanceTimer = metricProvider.getMetricFactory().timer(instanceCxt, Timer.TYPE.ONE_SHOT);
-//                
-//                MetricAttributesProvider metricAttributesProvider = attributesProviderManager.getAttributesProvider(stepName);
-//                if(metricAttributesProvider != null ) {
-//                    stepInstanceTimer.setAttributes(metricAttributesProvider.getMetricAttributes(context));
-//                }
-//                break;
-//            default:
-//                throw new IllegalArgumentException("Unknown service scope " + scope);
-//            }
-//			
-//			Timer.Split stepTimerSplit = null;
-//            if(stepTimer != null) {
-//                stepTimerSplit = stepTimer.time();
-//            }
-//          
-//            Timer.Split stepInstanceTimerSplit = null;
-//            if(stepInstanceTimer != null) {
-//               stepInstanceTimerSplit = stepInstanceTimer.time();
-//            }
-//            
-//            try {
-//                return context.proceed();
-//            } finally {
-//                if(stepTimerSplit != null) {
-//                    stepTimerSplit.stop();
-//                }
-//                if(stepInstanceTimerSplit != null) {
-//                    stepInstanceTimerSplit.stop();
-//                }
-//            }
-//		} else {
-//			return context.proceed();
-//		}
-//	}
-//}
+@MonitoringInterceptorType(scope=MonitoredScope.SERVICE_STEP)
+public class ServiceStepMonitoringInterceptor implements MonitoringInterceptor {
+    private static final String[] UNDEFINED_SERVICE = new String[] { "UNDEFINED" };
+    
+	@Inject @ApplicationMonitoringRegistry
+	private MetricProvider metricProvider;
+	
+	@Inject
+    private MetricAttributesProviderManager attributesProviderManager;
+	
+	protected MonitoringContext getStepContext(MonitoringContext cxt, String[] stepName, 
+            InvocationContext context) {
+	    if (stepName != null && !Arrays.equals(stepName, UNDEFINED_SERVICE)) {
+            return cxt.getOrCreateContext(stepName);
+        } else {
+            String className = context.getMethod().getDeclaringClass().getSimpleName();
+            String methodName = context.getMethod().getName();
+            return cxt.getOrCreateContext(className, methodName);
+        }
+	}
+
+	/**
+	 * Indicates whether the method invocation should be monitored.
+	 * Default behavior always returns true.
+	 * This method can be overridden
+	 *
+	 * @param context Method invocation context
+	 * @return true to enable Simon, false either
+	 */
+	protected boolean isMonitored(InvocationContext context) {
+		return true;
+	}
+
+	@Override
+	public Object monitor(InvocationContext context) throws Exception {
+		if (isMonitored(context)) {
+		    MonitoringContextProvider cxtProvider = metricProvider.getMonitoringContextProvider();
+		    
+		    Monitored monitorAnnotation = context.getMethod().getAnnotation(Monitored.class);
+            SERVICE_MONITORING_LEVEL scope = monitorAnnotation.level();
+            String[] stepName = monitorAnnotation.name();
+            
+            MonitoringContext serviceInstanceCxt = cxtProvider.getActiveInstanceContext();
+            MonitoringContext serviceCxt = serviceInstanceCxt.getParentContext();
+            
+            
+            MonitoringContext stepCxt = getStepContext(serviceCxt, stepName, context);
+            // make sure service aggregate is created
+            metricProvider.getMetricFactory().simpleAggregate(stepCxt);
+            
+            MonitoringContext stepInstanceCxt = getStepContext(serviceInstanceCxt, stepName, context);
+            
+            Timer timer;
+            
+            switch(scope) {
+            case SERVICE:
+                timer = metricProvider.getMetricFactory().timerOnlyForward(stepInstanceCxt, stepCxt);
+                break;
+            case SERVICE_INSTANCE: 
+                timer = metricProvider.getMetricFactory().timerWithForward(stepInstanceCxt, Timer.TYPE.ONE_SHOT, stepCxt);
+                
+                MetricAttributesProvider metricAttributesProvider = attributesProviderManager.getAttributesProvider(stepName);
+                if(metricAttributesProvider != null ) {
+                    timer.setAttributes(metricAttributesProvider.getMetricAttributes(context));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown service scope " + scope);
+            }
+			
+            Timer.Split split = timer.time();
+            
+            try {
+                return context.proceed();
+            } finally {
+                split.stop();
+            }
+		} else {
+			return context.proceed();
+		}
+	}
+}
 

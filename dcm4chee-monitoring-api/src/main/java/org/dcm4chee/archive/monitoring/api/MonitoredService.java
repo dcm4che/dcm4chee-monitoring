@@ -62,5 +62,5 @@ public @interface MonitoredService {
 	String[] name() default "UNDEFINED";
 	
 	@Nonbinding
-	MONITORING_SCOPE scope() default MONITORING_SCOPE.SERVICE;
+	SERVICE_MONITORING_LEVEL level() default SERVICE_MONITORING_LEVEL.SERVICE;
 }

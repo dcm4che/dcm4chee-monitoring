@@ -42,7 +42,7 @@ package org.dcm4chee.archive.monitoring.api;
 /**
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  */
-public enum MONITORING_SCOPE {
+public enum SERVICE_MONITORING_LEVEL {
     SERVICE,
     SERVICE_INSTANCE
 }
