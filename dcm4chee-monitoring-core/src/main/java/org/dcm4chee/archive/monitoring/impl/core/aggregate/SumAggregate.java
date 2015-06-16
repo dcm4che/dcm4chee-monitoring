@@ -41,6 +41,7 @@ package org.dcm4chee.archive.monitoring.impl.core.aggregate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.dcm4chee.archive.monitoring.impl.core.AbstractMetric;
 import org.dcm4chee.archive.monitoring.impl.core.Util;
@@ -48,7 +49,6 @@ import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoir;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoirSnapshot;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.Reservoir;
-import org.dcm4chee.archive.monitoring.impl.util.LongAdder;
 
 
 
@@ -57,67 +57,119 @@ import org.dcm4chee.archive.monitoring.impl.util.LongAdder;
  *
  */
 public class SumAggregate extends AbstractMetric implements Aggregate {
-	private final MonitoringContext context;
-	private final Reservoir forwardReservoir;
-
-	private final LongAdder sum = new LongAdder();
-	private final AggregatedReservoir reservoir;
+//    private static final Logger LOGGER = LoggerFactory.getLogger(SumAggregate.class);
+    
+	private final String[] name;
 	
-	public SumAggregate(MonitoringContext context, Reservoir forwardReservoir, AggregatedReservoir reservoir) {
-		this.context = context;
-		this.forwardReservoir = forwardReservoir;
-		this.reservoir = reservoir;
+	protected final AggregateState state;
+    protected final AtomicReference<AggregateState> stateRef;
+	
+	public SumAggregate(String[] name, Reservoir forwardReservoir, AggregatedReservoir reservoir) {
+	    this.name = name;
+	    this.state = new AggregateState(reservoir, forwardReservoir);
+        this.stateRef = new AtomicReference<>(state);
 	}
 	
 	@Override
 	public void update(MonitoringContext context, long now, long value) {
-		sum.add(value);
-		long sum = this.sum.sum();
-		reservoir.update(context, now, sum);
-		if (forwardReservoir != null) {
-			//TODO propagate original context or context of this aggregate?
-			forwardReservoir.update(context, now, value);
-		}
+//	    LOGGER.info("Updating sum aggregate " + Arrays.toString(name) + " from " + context);
+	    AggregateState state = lockState();
+        try {
+            state.update(context, value, now);
+        } finally {
+            unlockState(state);
+        }
 	}
 	
-	@Override
-	public AggregateSnapshot getSnapshot() {
-		AggregateSnapshotImpl snapshot = new AggregateSnapshotImpl();
-		
-		AggregatedReservoirSnapshot primarySnapshot = reservoir.getCurrentSnapshot();
-		snapshot.setValues(primarySnapshot.getValues(false));
-		snapshot.setSize(primarySnapshot.size());
-		snapshot.setMean(primarySnapshot.getMean());
-		snapshot.setStdDev(primarySnapshot.getStdDev());
-		snapshot.setMin(primarySnapshot.getMin());
-		snapshot.setMax(primarySnapshot.getMax());
-		snapshot.setFirstUsageTimestamp(primarySnapshot.getFirstUsageTimestamp());
-		snapshot.setLastUsageTimestamp(primarySnapshot.getLastUsageTimestamp());
-		snapshot.setMinTimestamp(primarySnapshot.getMinTimestamp());
-		snapshot.setMaxTimestamp(primarySnapshot.getMaxTimestamp());
-		snapshot.setSum(primarySnapshot.getSum());
-		
-		snapshot.setPath(Util.createPath(context.getPath()));
-	    snapshot.setAttributes(getAttributes(true));
-	    
-		return snapshot;
-	}
+	protected class AggregateState {
+        private final AggregatedReservoir reservoir;
+        private final Reservoir forwardReservoir;
+        private long sum;
+        
+        protected AggregateState(AggregatedReservoir reservoir, Reservoir forwardReservoir) {
+            this.reservoir = reservoir;
+            this.forwardReservoir = forwardReservoir;
+        }
+        
+        protected void update(MonitoringContext context, long value, long now) {
+           sum += value;
+           reservoir.update(context, now, sum);
+           if (forwardReservoir != null) {
+               //TODO propagate original context or context of this aggregate?
+               forwardReservoir.update(context, now, value);
+           }
+        }
+    }
+	
+	protected AggregateState lockState() {
+        /*
+         * Mark the state as locked by replacing 
+         * the referenced state with NULL
+         */
+        while (!stateRef.compareAndSet(state, null)) {
+            ;
+        }
+        return state;
+    }
+
+    protected void unlockState(AggregateState updatedState) {
+        /*
+         * Mark the state as unlocked by replacing 
+         * NULL with the updated state
+         */
+        if (!stateRef.compareAndSet(null, updatedState)) {
+            throw new IllegalArgumentException("Invalid synchronization state: Seems like trying to unlock without locking before");
+        }
+    }
+
+    @Override
+    public AggregateSnapshot getSnapshot() {
+        AggregateState state = lockState();
+        try {
+            AggregateSnapshotImpl snapshot = new AggregateSnapshotImpl();
+            AggregatedReservoirSnapshot primarySnapshot = state.reservoir.getCurrentSnapshot();
+            snapshot.setValues(primarySnapshot.getValues(false));
+            snapshot.setSize(primarySnapshot.size());
+            snapshot.setMean(primarySnapshot.getMean());
+            snapshot.setStdDev(primarySnapshot.getStdDev());
+            snapshot.setMin(primarySnapshot.getMin());
+            snapshot.setMax(primarySnapshot.getMax());
+            snapshot.setFirstUsageTimestamp(primarySnapshot.getFirstUsageTimestamp());
+            snapshot.setLastUsageTimestamp(primarySnapshot.getLastUsageTimestamp());
+            snapshot.setMinTimestamp(primarySnapshot.getMinTimestamp());
+            snapshot.setMaxTimestamp(primarySnapshot.getMaxTimestamp());
+            snapshot.setSum(primarySnapshot.getSum());
+
+            snapshot.setPath(Util.createPath(name));
+            snapshot.setAttributes(getAttributes(true));
+
+            return snapshot;
+        } finally {
+            unlockState(state);
+        }
+    }
 	    
 	@Override
 	public List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution) {
-		List<AggregatedReservoirSnapshot> reservoirSnapshots = reservoir.getSnapshots(start, end, resolution);
+        AggregateState state = lockState();
+        try {
 
-		// augment snapshots with path & attributes
-        if (!reservoirSnapshots.isEmpty()) {
-            String path = Util.createPath(context.getPath());
-            Map<String,Object> attrs = getAttributes(true);
-            for (AggregatedReservoirSnapshot reservoirSnapshot : reservoirSnapshots) {
-                reservoirSnapshot.setPath(path);
-                reservoirSnapshot.setAttributes(attrs);
-            } 
+            List<AggregatedReservoirSnapshot> reservoirSnapshots = state.reservoir.getSnapshots(start, end, resolution);
+
+            // augment snapshots with path & attributes
+            if (!reservoirSnapshots.isEmpty()) {
+                String path = Util.createPath(name);
+                Map<String, Object> attrs = getAttributes(true);
+                for (AggregatedReservoirSnapshot reservoirSnapshot : reservoirSnapshots) {
+                    reservoirSnapshot.setPath(path);
+                    reservoirSnapshot.setAttributes(attrs);
+                }
+            }
+
+            return reservoirSnapshots;
+        } finally {
+            unlockState(state);
         }
-        
-		return reservoirSnapshots;
 	}
 
 }

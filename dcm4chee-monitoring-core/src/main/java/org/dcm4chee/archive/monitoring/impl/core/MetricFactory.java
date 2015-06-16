@@ -229,7 +229,7 @@ public class MetricFactory {
             aggregate = NoSumAggregate.INSTANCE;
         } else {
             if("SUM".equals(type)) {
-                aggregate = new SumAggregate(context, forwardReservoir,
+                aggregate = new SumAggregate(context.getPath(), forwardReservoir,
                         reservoirFactory.createAggregateReservoirContainer());
             } else if("SIMPLE".equals(type)) {
                 aggregate = new SimpleAggregate(context.getPath(), forwardReservoir,
