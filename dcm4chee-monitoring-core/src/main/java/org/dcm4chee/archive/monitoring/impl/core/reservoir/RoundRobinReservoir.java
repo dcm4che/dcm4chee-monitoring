@@ -203,23 +203,36 @@ public class RoundRobinReservoir implements AggregatedReservoir {
 		if (!checkResolution(resolution)) {
 			throw new IllegalArgumentException(String.format("Query resolution (%d) must be a multiple of step size (step size is: %d)", resolution, step) );
 		}
-	
-		int primaryResolutionIdx = (int)(resolution / step) - 1;
 		
-		if(primaryResolutionIdx >= containers.length)
+		int startContainerIdx = -1;
+		for(int i = 0; i < containers.length; i++) {
+		    ArchiveContainer resolutionContainer = containers[i];
+		    boolean found = false;
+		    if(exactResolution) {
+		        found = resolutionContainer.resolution == resolution;
+		    } else {
+		        found = resolutionContainer.resolution >= resolution;
+		    }
+		    
+		    if(found) {
+		        startContainerIdx = i;
+		        break;
+		    }
+		}
+		
+		if(startContainerIdx == -1)
 		{
 			LOGGER.warn("Unsupported time resolution: {}", resolution);
 			return Collections.emptyList();
 		}
 		
-		int stopResolution = exactResolution ? primaryResolutionIdx + 1 : containers.length;
+		int stopResolution = exactResolution ? startContainerIdx + 1 : containers.length;
 		
-		for( int i = primaryResolutionIdx; i < stopResolution; i++) {
+		for( int i = startContainerIdx; i < stopResolution; i++) {
 			ArchiveContainer resolutionContainer = containers[i];
 			
 			long now = clock.getTime();
 			if(saneTime(now)) {
-//			resolutionContainer.updateCurrentArchiveOld(now);
 			    resolutionContainer.updateCurrentArchive(now);
 			}
 			
@@ -481,36 +494,6 @@ public class RoundRobinReservoir implements AggregatedReservoir {
 			this.start = firstArchive.getStart();
 			this.end = firstArchive.getEnd(); 
 		}
-		
-//		private void rollAndSetCurrent(Archive newCurrent) {
-//			currentIdx = (currentIdx + 1) % size;
-//			
-//			LOGGER.debug("Rolling round-robin archive: new current archive is {}", newCurrent);
-//			
-//			Archive oldArchive = archives[currentIdx];
-//			if( oldArchive != null) {
-//				Archive newOldestArchive = archives[(currentIdx + 1) % size];
-//                if (newOldestArchive == null) {
-//                    throw new IllegalStateException("Inconsistent archive container content");
-//                }
-//				this.start = newOldestArchive.getStart();
-//				
-//				LOGGER.debug("Purging round-robin archive: purged archive is {}", oldArchive);
-//			} 
-//			
-//			this.end = newCurrent.getEnd();
-//			
-//			archives[currentIdx] = newCurrent;
-//		}
-		
-//		private Archive updateCurrentArchiveOld(long now) {
-//			Archive currentArchive = archives[currentIdx];
-//			while(currentArchive.getEnd() < now) {
-//				currentArchive = currentArchive.next();
-//				rollAndSetCurrent(currentArchive);
-//			}
-//			return currentArchive;
-//		}
 		
 		private Archive updateCurrentArchive(long now) {
             Archive currentArchive = archives[currentIdx];

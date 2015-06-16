@@ -75,10 +75,8 @@ public class TimeHelpers {
         try {
             return dateParser.parse(dateString);
         } catch (Exception e) {
-            LOGGER.error("Error while parsing date string", e);
+            return null;
         }
-
-        return null;
     }
     
     public static Date parseNaturalDateDescription(Clock clock, String dateDescription) {
