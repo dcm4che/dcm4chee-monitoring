@@ -83,12 +83,20 @@ public class MetricFactory {
         if (metric != null) {
             return metric;
         } else {
-            Aggregate aggregate = new SimpleAggregate(cxt.getPath(), 
-                    reservoirFactory.createAggregateReservoirContainer());
+            ForwardingReservoir forwarding = addAttachedContexts(cxt, null);
+            return createAggregateInt(forwarding, cxt, "SIMPLE");
+        }
+    }
+	
+	public Aggregate simpleAggregateWithForward(MonitoringContext cxt, MonitoringContext forwardCxt) {
+        final Aggregate metric = metricRegistry.getMetric(Aggregate.class, cxt);
+        if (metric != null) {
+            return metric;
+        } else {
+            ForwardingReservoir forwarding = createForward(forwardCxt);
+            forwarding = addAttachedContexts(cxt, forwarding);
             
-            metricRegistry.register(cxt, aggregate);
-            
-            return aggregate;
+            return createAggregateInt(forwarding, cxt, "SIMPLE");
         }
     }
 	
@@ -99,9 +107,7 @@ public class MetricFactory {
         } else {
             ForwardingReservoir forwarding = createForward(forwardCxt);
             forwarding = addAttachedContexts(cxt, forwarding);
-            Aggregate created = new ForwardOnlyAggregate(forwarding);
-            metricRegistry.register(cxt, created);
-            return created;
+            return createAggregateInt(forwarding, cxt, "FORWARDING");
         }
 	}
 	
@@ -111,7 +117,7 @@ public class MetricFactory {
 			return metric;
 		} else {
 		    ForwardingReservoir forwarding = addAttachedContexts(monitoringContext, null);
-			return createAggregateInt(forwarding, monitoringContext);
+			return createAggregateInt(forwarding, monitoringContext, "SUM");
 		}
 	}
 	
@@ -123,7 +129,7 @@ public class MetricFactory {
             ForwardingReservoir forwarding = createForward(forwardCxt);
             forwarding = addAttachedContexts(cxt, forwarding);
             
-            return createAggregateInt(forwarding, cxt);
+            return createAggregateInt(forwarding, cxt, "SUM");
         }
     }
 	
@@ -217,13 +223,22 @@ public class MetricFactory {
         return forwarding;
     }
 	
-	private Aggregate createAggregateInt(Reservoir forwardReservoir, MonitoringContext context) {
+	private Aggregate createAggregateInt(Reservoir forwardReservoir, MonitoringContext context, String type) {
         Aggregate aggregate = null;
         if (!context.isEnabled()) {
             aggregate = NoSumAggregate.INSTANCE;
         } else {
-            aggregate = new SumAggregate(context, forwardReservoir,
-                    reservoirFactory.createAggregateReservoirContainer());
+            if("SUM".equals(type)) {
+                aggregate = new SumAggregate(context, forwardReservoir,
+                        reservoirFactory.createAggregateReservoirContainer());
+            } else if("SIMPLE".equals(type)) {
+                aggregate = new SimpleAggregate(context.getPath(), forwardReservoir,
+                        reservoirFactory.createAggregateReservoirContainer());
+            } else if("FORWARDING".equals(type)) {
+                    aggregate = new ForwardOnlyAggregate(forwardReservoir);
+            } else {
+                throw new IllegalArgumentException("Unknown aggregate type: " + type);
+            }
         }
         
         metricRegistry.register(context, aggregate);

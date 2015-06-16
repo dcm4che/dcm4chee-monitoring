@@ -62,6 +62,7 @@ public class AggregateSnapshotImpl implements AggregateSnapshot {
 	private long minTimestamp;
 	private long firstUsageTimestamp;
 	private long lastUsageTimestamp;
+	private long sum;
 	
 	private Map<String, Object> attributes = Collections.emptyMap();
 	
@@ -160,6 +161,15 @@ public class AggregateSnapshotImpl implements AggregateSnapshot {
 		this.stdDev = stdDev;
 	}
 	
+    @Override
+    public long getSum() {
+        return sum;
+    }
+
+    public void setSum(long sum) {
+        this.sum = sum;
+    }
+
 	public void setSize(long size) {
 		this.size = size;
 	}

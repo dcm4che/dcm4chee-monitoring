@@ -95,6 +95,7 @@ public class SumAggregate extends AbstractMetric implements Aggregate {
 		snapshot.setLastUsageTimestamp(primarySnapshot.getLastUsageTimestamp());
 		snapshot.setMinTimestamp(primarySnapshot.getMinTimestamp());
 		snapshot.setMaxTimestamp(primarySnapshot.getMaxTimestamp());
+		snapshot.setSum(primarySnapshot.getSum());
 		
 		snapshot.setPath(Util.createPath(context.getPath()));
 	    snapshot.setAttributes(getAttributes(true));

@@ -55,5 +55,7 @@ public interface AggregateSnapshot extends ReservoirSnapshot {
 	Map<String,Object> getAttributes();
 	
 	long[] getValues(boolean copy);
+	
+	long getSum();
 
 }

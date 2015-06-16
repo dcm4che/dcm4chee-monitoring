@@ -55,7 +55,7 @@ public class ServiceLevelStrategy extends ServiceInstanceLevelStrategy {
             MonitoringContext serviceCxt = serviceInstanceCxt.getParentContext();
             
             MonitoringContext serviceConnectionCxt = serviceCxt.getOrCreateContext(CONNECTION);
-            getMetricFactory().sumAggregate(serviceConnectionCxt);
+            getMetricFactory().simpleAggregate(serviceConnectionCxt);
                     
             MonitoringContext serviceInstanceConnectionCxt = serviceInstanceCxt.getOrCreateContext(CONNECTION);
             getMetricFactory().forwardAggregate(serviceInstanceConnectionCxt, serviceConnectionCxt); 

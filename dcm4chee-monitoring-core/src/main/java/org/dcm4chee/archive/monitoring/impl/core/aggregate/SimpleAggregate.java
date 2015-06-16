@@ -47,6 +47,7 @@ import org.dcm4chee.archive.monitoring.impl.core.Util;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoir;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoirSnapshot;
+import org.dcm4chee.archive.monitoring.impl.core.reservoir.Reservoir;
 
 /**
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
@@ -54,10 +55,13 @@ import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoirSn
  */
 public class SimpleAggregate extends AbstractMetric implements Aggregate {
     private final String[] name;
+    
+    private final Reservoir forwardReservoir;
     private final AggregatedReservoir reservoir;
     
-    public SimpleAggregate(String[] name, AggregatedReservoir reservoir) {
+    public SimpleAggregate(String[] name, Reservoir forwardReservoir, AggregatedReservoir reservoir) {
         this.name = name;
+        this.forwardReservoir = forwardReservoir;
         this.reservoir = reservoir;
     }
 
@@ -76,6 +80,7 @@ public class SimpleAggregate extends AbstractMetric implements Aggregate {
         snapshot.setLastUsageTimestamp(primarySnapshot.getLastUsageTimestamp());
         snapshot.setMinTimestamp(primarySnapshot.getMinTimestamp());
         snapshot.setMaxTimestamp(primarySnapshot.getMaxTimestamp());
+        snapshot.setSum(primarySnapshot.getSum());
         
         snapshot.setPath(Util.createPath(name));
         snapshot.setAttributes(getAttributes(true));
@@ -86,6 +91,10 @@ public class SimpleAggregate extends AbstractMetric implements Aggregate {
     @Override
     public void update(MonitoringContext context, long now, long value) {
         reservoir.update(context, now, value);
+        if (forwardReservoir != null) {
+            //TODO propagate original context or context of this aggregate?
+            forwardReservoir.update(context, now, value);
+        }
     }
 
     @Override

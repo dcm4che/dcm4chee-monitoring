@@ -73,6 +73,7 @@ public class AggregateTimerResponse extends MetricResponse {
 		response.setMaxTimestamp(snapshot.getMaxTimestamp(), UnitOfTime.MILLISECONDS);
 		response.setMean(snapshot.getMean(), UnitOfTime.NANOSECONDS);
         response.setStdDev(snapshot.getStdDev(), timeUnit.scaleFromNano());
+        response.setSum(snapshot.getSum(), UnitOfTime.NANOSECONDS);
 		return response;
 	}
 	

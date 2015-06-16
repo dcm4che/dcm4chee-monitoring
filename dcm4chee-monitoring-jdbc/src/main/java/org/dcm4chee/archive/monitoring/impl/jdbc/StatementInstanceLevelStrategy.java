@@ -56,11 +56,11 @@ public class StatementInstanceLevelStrategy extends AbstractLevelStrategy {
             MonitoringContext serviceCxt = serviceInstanceCxt.getParentContext();
             
             MonitoringContext serviceConnectionCxt = serviceCxt.getOrCreateContext(CONNECTION);
-            getMetricFactory().sumAggregate(serviceConnectionCxt);
+            getMetricFactory().simpleAggregate(serviceConnectionCxt);
                     
             MonitoringContext serviceInstanceConnectionCxt = serviceInstanceCxt.getOrCreateContext(CONNECTION);
             
-            getMetricFactory().sumAggregateWithForward(serviceInstanceConnectionCxt, serviceConnectionCxt); 
+            getMetricFactory().simpleAggregateWithForward(serviceInstanceConnectionCxt, serviceConnectionCxt); 
         }
         
         return serviceInstanceCxt.getOrCreateInstanceContext(connection, CONNECTION);
