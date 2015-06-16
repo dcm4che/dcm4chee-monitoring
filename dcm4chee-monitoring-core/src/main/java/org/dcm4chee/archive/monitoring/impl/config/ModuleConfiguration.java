@@ -39,6 +39,9 @@
 
 package org.dcm4chee.archive.monitoring.impl.config;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  *
@@ -47,6 +50,7 @@ public class ModuleConfiguration {
     private String moduleName;
     private boolean enabled;
     private String level;
+    private Map<String,String> parameters = Collections.emptyMap();
     
     public String getModuleName() {
         return moduleName;
@@ -64,8 +68,17 @@ public class ModuleConfiguration {
     public String getLevel() {
         return level;
     }
+    
     public void setLevel(String level) {
         this.level = level;
     }
+    
+	public Map<String, String> getParameters() {
+		return parameters;
+	}
+	
+	public void setParameters(Map<String, String> parameters) {
+		this.parameters = parameters;
+	}
     
 }

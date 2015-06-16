@@ -65,6 +65,8 @@ public class JdbcMonitoringModule implements MonitoringModule {
             return;
         }
         
+        Parameters.initialize(cfg);
+        
         JdbcWrapper jdbcWrapper = JdbcWrapper.SINGLETON;
         
         String levelString = cfg.getLevel();

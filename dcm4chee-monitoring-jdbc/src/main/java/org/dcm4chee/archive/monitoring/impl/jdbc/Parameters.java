@@ -1,35 +1,27 @@
 
 package org.dcm4chee.archive.monitoring.impl.jdbc;
 
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 
-final class Parameters {
-	static final String PARAMETER_SYSTEM_PREFIX = "javamelody.";
-	static final String JAVA_VERSION = System.getProperty("java.version");
+import org.dcm4chee.archive.monitoring.impl.config.ModuleConfiguration;
 
-	private static FilterConfig filterConfig;
+final class Parameters {
+	private static final String PARAMETER_SYSTEM_PREFIX = "csp-monitoring.";
+	
 	private static ServletContext servletContext;
+	private static ModuleConfiguration moduleCfg;
 
 
 	private Parameters() {
 		super();
 	}
 
-	static void initialize(FilterConfig config) {
-		filterConfig = config;
-		if (config != null) {
-			final ServletContext context = config.getServletContext();
-			initialize(context);
-		}
-	}
-
 	static void initialize(ServletContext context) {
-		if ("1.6".compareTo(JAVA_VERSION) > 0) {
-			throw new IllegalStateException("La version java doit être 1.6 au minimum et non "
-					+ JAVA_VERSION);
-		}
 		servletContext = context;
+	}
+	
+	static void initialize(ModuleConfiguration cfg) {
+		moduleCfg = cfg;
 	}
 
 	static boolean isSystemActionsEnabled() {
@@ -43,7 +35,7 @@ final class Parameters {
 		return getParameterByName(name);
 	}
 
-	static String getParameterByName(String parameterName) {
+	private static String getParameterByName(String parameterName) {
 		assert parameterName != null;
 		final String globalName = PARAMETER_SYSTEM_PREFIX + parameterName;
 		String result = System.getProperty(globalName);
@@ -61,12 +53,14 @@ final class Parameters {
 				return (String) attribute;
 			}
 		}
-		if (filterConfig != null) {
-			result = filterConfig.getInitParameter(parameterName);
+		
+		if(moduleCfg != null) {
+			result = moduleCfg.getParameters().get(parameterName);
 			if (result != null) {
 				return result;
 			}
 		}
+		
 		return null;
 	}
 }

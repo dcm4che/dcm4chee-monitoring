@@ -45,7 +45,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
@@ -140,6 +142,13 @@ public class JsonMonitoringConfigurationProviderTest {
         nodeCfg1.setEnabled(true);
         nodeCfg1.setContextPath(new String[0]);
         
+        ModuleConfiguration mCfg = new ModuleConfiguration();
+        Map<String,String> params = new HashMap<>();
+        params.put("datasources", "java:/jndi, test");
+        params.put("flag", "true");
+        mCfg.setParameters(params);
+        mCfg.setParameters(params);
+        
         
         Configuration cfg = new Configuration();
         cfg.setStartupConfiguration(startupCfg);
@@ -148,6 +157,7 @@ public class JsonMonitoringConfigurationProviderTest {
         cfg.setMetricReservoirConfigurations(Arrays.asList(metricResCfg1, metricResCfg2));
         cfg.setNodeConfigurations(Arrays.asList(nodeCfg1));
         
+        cfg.setModuleConfigurations(Arrays.asList(mCfg));
         
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
