@@ -54,4 +54,6 @@ public interface Aggregate extends Metric, Sampling<AggregateSnapshot>, Reservoi
 	
 	List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution);
 	
+	List<AggregatedReservoirSnapshot> getSnapshots();
+	
 }

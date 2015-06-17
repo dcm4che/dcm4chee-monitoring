@@ -39,39 +39,24 @@
 
 package org.dcm4chee.archive.monitoring.impl.core.metric;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.dcm4chee.archive.monitoring.impl.core.AbstractMetric;
+import org.dcm4chee.archive.monitoring.impl.core.aggregate.AbstractAggregate;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.Aggregate;
-import org.dcm4chee.archive.monitoring.impl.core.aggregate.AggregateSnapshot;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
-import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoirSnapshot;
 
 /**
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  *
  */
-public class NoSumAggregate extends AbstractMetric implements Aggregate {
+public class NoSumAggregate extends AbstractAggregate implements Aggregate {
     public static NoSumAggregate INSTANCE = new NoSumAggregate();
     
     private NoSumAggregate() {
-        //NOOP
-    }
-
-    @Override
-    public AggregateSnapshot getSnapshot() {
-        return null;
+        super(new String[] { "NoSumAggregate" });
     }
 
     @Override
     public void update(MonitoringContext context, long now, long value) {
         // NOOP
-    }
-
-    @Override
-    public List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution) {
-        return Collections.emptyList();
     }
 
 }

@@ -63,8 +63,8 @@ public class CounterResponse extends MetricResponse {
 	public static CounterResponse create(AggregatedReservoirSnapshot snapshot) {
         CounterResponse response = new CounterResponse();
         response.setPath(snapshot.getPath());
-        response.setStart(snapshot.getFirstUsageTimestamp(), UnitOfTime.MILLISECONDS);
-        response.setEnd(snapshot.getLastUsageTimestamp(), UnitOfTime.MILLISECONDS);
+    	response.setStart(snapshot.getStart(), UnitOfTime.MILLISECONDS);
+        response.setEnd(snapshot.getEnd(), UnitOfTime.MILLISECONDS);
         response.setAttributes(snapshot.getAttributes());
         response.setFirstUsageTimestamp(snapshot.getFirstUsageTimestamp(), UnitOfTime.MILLISECONDS);
         response.setLastUsageTimestamp(snapshot.getLastUsageTimestamp(), UnitOfTime.MILLISECONDS);

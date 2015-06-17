@@ -162,11 +162,32 @@ public class CounterImpl extends AbstractMetric implements Counter {
     }
 
     @Override
-    public List<AggregatedReservoirSnapshot> getSnapshots(long start, long end,
-            long resolution) {
+    public List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution) {
         CounterImplState state = lockState();
         try {
             List<AggregatedReservoirSnapshot> reservoirSnapshots = state.reservoir.getSnapshots(start, end, resolution);
+
+            // augment snapshots with path & attributes
+            if (!reservoirSnapshots.isEmpty()) {
+                String path = Util.createPath(context.getPath());
+                Map<String, Object> attrs = getAttributes(true);
+                for (AggregatedReservoirSnapshot reservoirSnapshot : reservoirSnapshots) {
+                    reservoirSnapshot.setPath(path);
+                    reservoirSnapshot.setAttributes(attrs);
+                }
+            }
+
+            return reservoirSnapshots;
+        } finally {
+            unlockState(state);
+        }
+    }
+    
+    @Override
+    public List<AggregatedReservoirSnapshot> getSnapshots() {
+        CounterImplState state = lockState();
+        try {
+            List<AggregatedReservoirSnapshot> reservoirSnapshots = state.reservoir.getSnapshots();
 
             // augment snapshots with path & attributes
             if (!reservoirSnapshots.isEmpty()) {

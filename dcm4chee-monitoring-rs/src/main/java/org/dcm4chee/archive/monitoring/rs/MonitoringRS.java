@@ -57,7 +57,6 @@ import org.dcm4chee.archive.monitoring.impl.core.MetricProvider;
 import org.dcm4chee.archive.monitoring.impl.core.MetricRegistry;
 import org.dcm4chee.archive.monitoring.impl.core.Timer;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.Aggregate;
-import org.dcm4chee.archive.monitoring.impl.core.aggregate.AggregateSnapshot;
 import org.dcm4chee.archive.monitoring.impl.core.clocks.Clock;
 import org.dcm4chee.archive.monitoring.impl.core.context.AllMatchMonitoringContextFilter;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
@@ -220,10 +219,15 @@ public class MonitoringRS {
 				if (metric instanceof Timer) {
 					Timer timer = (Timer)metric;
 					if(timeSpec == TimeSpec.ALL) {
-						AggregatedReservoirSnapshot snapshot = timer.getSnapshot();
-						if( snapshot != null) {
-						    TimerResponse timerResponse = TimerResponse.create(snapshot, timeUnit);
-	                        metricResponse.addTimer(timerResponse);
+//						AggregatedReservoirSnapshot snapshot = timer.getSnapshot();
+//						if( snapshot != null) {
+//						    TimerResponse timerResponse = TimerResponse.create(snapshot, timeUnit);
+//	                        metricResponse.addTimer(timerResponse);
+//						}
+						List<AggregatedReservoirSnapshot> snapshots = timer.getSnapshots();
+						for (AggregatedReservoirSnapshot snapshot : snapshots) {
+							TimerResponse timerResponse = TimerResponse.create(snapshot, timeUnit);
+							metricResponse.addTimer(timerResponse);
 						}
 					} else {
 						List<AggregatedReservoirSnapshot> snapshots = timer.getSnapshots(timeSpec.getStart(), timeSpec.getEnd(), timeSpec.getResolution());
@@ -235,25 +239,36 @@ public class MonitoringRS {
 				} else if (metric instanceof Counter) {
 					Counter counter = (Counter)metric;
 					if(timeSpec == TimeSpec.ALL) {
-						AggregatedReservoirSnapshot snapshot = counter.getSnapshot();
-						if(snapshot != null) {
-						    CounterResponse counterResponse = CounterResponse.create(snapshot);
-	                        metricResponse.addCounter(counterResponse);
-						}
-					} else {
-//						List<AggregatedReservoirSnapshot> snapshots = counter.getSnapshots(timeSpec.getStart(), timeSpec.getEnd(), timeSpec.getResolution());
-//						for (AggregatedReservoirSnapshot snapshot : snapshots) {
-//							CounterResponse counterResponse = CounterResponse.create(snapshot, timeUnit);
-//							metricResponse.addCounter(counterResponse);
+//						AggregatedReservoirSnapshot snapshot = counter.getSnapshot();
+//						if(snapshot != null) {
+//						    CounterResponse counterResponse = CounterResponse.create(snapshot);
+//	                        metricResponse.addCounter(counterResponse);
 //						}
+						List<AggregatedReservoirSnapshot> snapshots = counter.getSnapshots();
+						for (AggregatedReservoirSnapshot snapshot : snapshots) {
+							CounterResponse counterResponse = CounterResponse.create(snapshot);
+							metricResponse.addCounter(counterResponse);
+						}
+						
+					} else {
+						List<AggregatedReservoirSnapshot> snapshots = counter.getSnapshots(timeSpec.getStart(), timeSpec.getEnd(), timeSpec.getResolution());
+						for (AggregatedReservoirSnapshot snapshot : snapshots) {
+							CounterResponse counterResponse = CounterResponse.create(snapshot);
+							metricResponse.addCounter(counterResponse);
+						}
 					}
 				} else if (metric instanceof Aggregate) {
 					Aggregate aggregate = (Aggregate)metric;
 					if(timeSpec == TimeSpec.ALL) {
-						AggregateSnapshot snapshot = aggregate.getSnapshot();
-						if(snapshot != null) {
-						    AggregateTimerResponse aggregateResponse = AggregateTimerResponse.create(snapshot, timeUnit);
-	                        metricResponse.addAggregate(aggregateResponse);
+//						AggregateSnapshot snapshot = aggregate.getSnapshot();
+//						if(snapshot != null) {
+//						    AggregateTimerResponse aggregateResponse = AggregateTimerResponse.create(snapshot, timeUnit);
+//	                        metricResponse.addAggregate(aggregateResponse);
+//						}
+						List<AggregatedReservoirSnapshot> snapshots = aggregate.getSnapshots();
+						for (AggregatedReservoirSnapshot snapshot : snapshots) {
+							AggregateTimerResponse aggregateResponse = AggregateTimerResponse.create(snapshot, timeUnit);
+							metricResponse.addAggregate(aggregateResponse);
 						}
 					} else {
 						List<AggregatedReservoirSnapshot> snapshots = aggregate.getSnapshots(timeSpec.getStart(), timeSpec.getEnd(), timeSpec.getResolution());

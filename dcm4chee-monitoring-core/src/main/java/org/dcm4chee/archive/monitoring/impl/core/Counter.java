@@ -64,4 +64,6 @@ public interface Counter extends Metric, Sampling<AggregatedReservoirSnapshot> {
 	
 	List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution);
 	
+	List<AggregatedReservoirSnapshot> getSnapshots();
+	
 }

@@ -37,37 +37,42 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.monitoring.impl.core;
+package org.dcm4chee.archive.monitoring.impl.core.aggregate;
 
-import java.io.Closeable;
+import java.util.Collections;
 import java.util.List;
 
+import org.dcm4chee.archive.monitoring.impl.core.AbstractMetric;
+import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoirSnapshot;
 
 /**
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  *
  */
-public interface Timer extends Metric, Sampling<AggregatedReservoirSnapshot> {
-	public enum TYPE {
-		DEFAULT,
-		ONE_SHOT
-	}
+public abstract class AbstractAggregate extends AbstractMetric implements Aggregate {
+	protected final String[] name;
 	
-	interface Split extends Closeable {
-		
-		long stop();
-		
-		@Override
-		// override method to signal that no exception is thrown as defined by the parent signature
-		void close();
-		
-	}
-	
-	Split time();
-	
-	List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution);
-	
-	List<AggregatedReservoirSnapshot> getSnapshots();
-	
+    public AbstractAggregate(String[] name) {
+    	this.name = name;
+    }
+   
+    @Override
+    public abstract void update(MonitoringContext context, long now, long value);
+    
+    @Override
+    public AggregateSnapshot getSnapshot() {
+        return null;
+    }
+    
+    @Override
+    public List<AggregatedReservoirSnapshot> getSnapshots() {
+    	return Collections.emptyList();
+    }
+
+    @Override
+    public List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution) {
+        return Collections.emptyList();
+    }
+
 }

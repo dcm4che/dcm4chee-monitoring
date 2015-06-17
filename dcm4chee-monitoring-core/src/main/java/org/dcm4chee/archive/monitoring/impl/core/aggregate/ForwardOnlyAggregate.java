@@ -39,38 +39,24 @@
 
 package org.dcm4chee.archive.monitoring.impl.core.aggregate;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.dcm4chee.archive.monitoring.impl.core.AbstractMetric;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
-import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoirSnapshot;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.Reservoir;
 
 /**
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  *
  */
-public class ForwardOnlyAggregate extends AbstractMetric implements Aggregate {
+public class ForwardOnlyAggregate extends AbstractAggregate implements Aggregate {
     private final Reservoir forwardReservoir;
     
-    public ForwardOnlyAggregate(Reservoir forwardReservoir) {
+    public ForwardOnlyAggregate(String[] name, Reservoir forwardReservoir) {
+    	super(name);
         this.forwardReservoir = forwardReservoir;
-    }
-    
-    @Override
-    public AggregateSnapshot getSnapshot() {
-        return null;
     }
 
     @Override
     public void update(MonitoringContext context, long now, long value) {
         forwardReservoir.update(context, now, value);
-    }
-
-    @Override
-    public List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution) {
-        return Collections.emptyList();
     }
 
 }

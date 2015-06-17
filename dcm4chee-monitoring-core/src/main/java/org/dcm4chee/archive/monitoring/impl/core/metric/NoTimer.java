@@ -68,7 +68,12 @@ public class NoTimer extends AbstractMetric implements Timer {
     public Split time() {
         return noSplit;
     }
-
+    
+    @Override
+	public List<AggregatedReservoirSnapshot> getSnapshots() {
+		return Collections.emptyList();
+	}
+   
     @Override
     public List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution) {
         return Collections.emptyList();
@@ -87,6 +92,5 @@ public class NoTimer extends AbstractMetric implements Timer {
         }
         
     }
-   
 
 }

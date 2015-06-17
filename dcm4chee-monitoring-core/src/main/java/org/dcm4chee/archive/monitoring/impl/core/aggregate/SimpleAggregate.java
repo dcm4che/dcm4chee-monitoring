@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.dcm4chee.archive.monitoring.impl.core.AbstractMetric;
 import org.dcm4chee.archive.monitoring.impl.core.Util;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoir;
@@ -56,14 +55,12 @@ import org.dcm4chee.archive.monitoring.impl.core.reservoir.Reservoir;
  * @author Alexander Hoermandinger <alexander.hoermandinger@agfa.com>
  *
  */
-public class SimpleAggregate extends AbstractMetric implements Aggregate {
-	private final String[] name;
-	
+public class SimpleAggregate extends AbstractAggregate implements Aggregate {
 	protected final AggregateState state;
     protected final AtomicReference<AggregateState> stateRef;
 	
 	public SimpleAggregate(String[] name, Reservoir forwardReservoir, AggregatedReservoir reservoir) {
-	    this.name = name;
+	    super(name);
 	    this.state = new AggregateState(reservoir, forwardReservoir);
         this.stateRef = new AtomicReference<>(state);
 	}
@@ -150,6 +147,29 @@ public class SimpleAggregate extends AbstractMetric implements Aggregate {
         try {
 
             List<AggregatedReservoirSnapshot> reservoirSnapshots = state.reservoir.getSnapshots(start, end, resolution);
+
+            // augment snapshots with path & attributes
+            if (!reservoirSnapshots.isEmpty()) {
+                String path = Util.createPath(name);
+                Map<String, Object> attrs = getAttributes(true);
+                for (AggregatedReservoirSnapshot reservoirSnapshot : reservoirSnapshots) {
+                    reservoirSnapshot.setPath(path);
+                    reservoirSnapshot.setAttributes(attrs);
+                }
+            }
+
+            return reservoirSnapshots;
+        } finally {
+            unlockState(state);
+        }
+	}
+	
+	@Override
+	public List<AggregatedReservoirSnapshot> getSnapshots() {
+        AggregateState state = lockState();
+        try {
+
+            List<AggregatedReservoirSnapshot> reservoirSnapshots = state.reservoir.getSnapshots();
 
             // augment snapshots with path & attributes
             if (!reservoirSnapshots.isEmpty()) {

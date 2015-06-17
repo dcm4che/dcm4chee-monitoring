@@ -188,6 +188,28 @@ public class TimerImpl extends AbstractMetric implements Timer {
 		}
 	}
     
+    @Override
+    public List<AggregatedReservoirSnapshot> getSnapshots() {
+		TimerImplState state = lockState();
+		try {
+			List<AggregatedReservoirSnapshot> reservoirSnapshots = state.reservoir.getSnapshots();
+			
+			// augment snapshots with path & attributes
+			if (!reservoirSnapshots.isEmpty()) {
+			    String path = Util.createPath(context.getPath());
+			    Map<String,Object> attrs = getAttributes(true);
+			    for (AggregatedReservoirSnapshot reservoirSnapshot : reservoirSnapshots) {
+	                reservoirSnapshot.setPath(path);
+	                reservoirSnapshot.setAttributes(attrs);
+	            } 
+			}
+			
+			return reservoirSnapshots;
+		} finally {
+			unlockState(state);
+		}
+	}
+    
     public String toString() {
         return String.format("TimerImpl(%s)", context);
     }

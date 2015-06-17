@@ -51,6 +51,8 @@ public interface AggregatedReservoir extends Reservoir {
 	
     AggregatedReservoirSnapshot getCurrentSnapshot();
     
+    List<AggregatedReservoirSnapshot> getSnapshots();
+    
 	List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution);
 	
 }

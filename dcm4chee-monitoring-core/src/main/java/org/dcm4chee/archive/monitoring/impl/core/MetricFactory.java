@@ -179,7 +179,7 @@ public class MetricFactory {
         if (counter != null) {
             return counter;
         } else {
-            Counter parentTimer = metricRegistry.getParentMetric(Counter.class, monitoringContext);
+            Counter parentTimer = null; //metricRegistry.getParentMetric(Counter.class, monitoringContext);
             return createCounterInt(parentTimer, monitoringContext, type);
         }
     }
@@ -235,7 +235,7 @@ public class MetricFactory {
                 aggregate = new SimpleAggregate(context.getPath(), forwardReservoir,
                         reservoirFactory.createAggregateReservoirContainer());
             } else if("FORWARDING".equals(type)) {
-                    aggregate = new ForwardOnlyAggregate(forwardReservoir);
+                    aggregate = new ForwardOnlyAggregate(context.getPath(), forwardReservoir);
             } else {
                 throw new IllegalArgumentException("Unknown aggregate type: " + type);
             }

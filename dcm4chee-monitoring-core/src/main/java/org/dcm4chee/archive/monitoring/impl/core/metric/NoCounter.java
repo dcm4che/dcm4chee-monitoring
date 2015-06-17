@@ -87,4 +87,9 @@ public class NoCounter extends AbstractMetric implements Counter {
         return Collections.emptyList();
     }
 
+	@Override
+	public List<AggregatedReservoirSnapshot> getSnapshots() {
+		return Collections.emptyList();
+	}
+
 }

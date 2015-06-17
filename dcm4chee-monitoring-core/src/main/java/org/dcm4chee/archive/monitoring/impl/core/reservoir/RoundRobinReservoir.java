@@ -183,12 +183,23 @@ public class RoundRobinReservoir implements AggregatedReservoir {
 	    
 	    long now = clock.getTime();
 	    if(saneTime(now)) {
-//	    smallestResolutionContainer.updateCurrentArchiveOld(now);
 	        smallestResolutionContainer.updateCurrentArchive(now);
 	    }
 	    
 	    return smallestResolutionContainer.getCurrentArchiveSnapshot();
     }
+	
+	@Override
+	public List<AggregatedReservoirSnapshot> getSnapshots() {
+		ArchiveContainer smallestResolutionContainer = containers[0];
+	    
+	    long now = clock.getTime();
+	    if(saneTime(now)) {
+	        smallestResolutionContainer.updateCurrentArchive(now);
+	    }
+	    
+	    return smallestResolutionContainer.getSnapshots();
+	}
 	
 	@Override
 	public List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution) {
@@ -602,6 +613,20 @@ public class RoundRobinReservoir implements AggregatedReservoir {
 		private AggregatedReservoirSnapshot getCurrentArchiveSnapshot() {
 		    Archive currentArchive = archives[currentIdx];
 		    return copyToSnapshot(currentArchive);
+		}
+		
+		private List<AggregatedReservoirSnapshot> getSnapshots() {
+			List<AggregatedReservoirSnapshot> snapshots = new ArrayList<>();
+			
+			int oldestArchiveIdx = getOldestArchiveIndex();
+			for(int i = currentIdx;; i = (i - 1) % size) {
+				snapshots.add(copyToSnapshot(archives[i]));
+				if(i == oldestArchiveIdx) {
+					break;
+				}
+			}
+			
+			return snapshots;
 		}
 		
 		private static AggregatedReservoirSnapshotImpl copyToSnapshot(Archive archive) {

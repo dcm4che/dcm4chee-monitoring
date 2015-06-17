@@ -154,6 +154,11 @@ public class ForwardOnlyTimer extends AbstractMetric implements Timer {
         return Collections.emptyList();
     }
     
+	@Override
+	public List<AggregatedReservoirSnapshot> getSnapshots() {
+		return Collections.emptyList();
+	}
+    
     public String toString() {
         return String.format("ForwardOnlyTimer(%s)", context);
     }

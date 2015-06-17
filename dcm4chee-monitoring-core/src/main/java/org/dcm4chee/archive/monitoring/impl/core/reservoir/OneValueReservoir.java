@@ -39,6 +39,7 @@
 
 package org.dcm4chee.archive.monitoring.impl.core.reservoir;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -108,7 +109,7 @@ public class OneValueReservoir extends AbstractAggregatedReservoir {
     }
 
     @Override
-    public AggregatedReservoirSnapshotImpl getCurrentSnapshot() {
+    public AggregatedReservoirSnapshot getCurrentSnapshot() {
         AggregatedReservoirSnapshotImpl snapshot = new AggregatedReservoirSnapshotImpl();
         snapshot.setStart(start);
         snapshot.setEnd(clock.getTime());
@@ -129,6 +130,11 @@ public class OneValueReservoir extends AbstractAggregatedReservoir {
     @Override
     public List<AggregatedReservoirSnapshot> getSnapshots(long start, long end, long resolution) {
         return Collections.emptyList();
+    }
+    
+    @Override
+    public List<AggregatedReservoirSnapshot> getSnapshots() {
+        return Arrays.asList(getCurrentSnapshot());
     }
 
 }
