@@ -244,14 +244,18 @@ public class MonitoringRS {
 //						}
 						List<AggregatedReservoirSnapshot> snapshots = timer.getSnapshots();
 						for (AggregatedReservoirSnapshot snapshot : snapshots) {
-							TimerResponse timerResponse = TimerResponse.create(snapshot, timeUnit);
-							metricResponse.addTimer(timerResponse);
+							if(snapshot.size() > 0) {
+								TimerResponse timerResponse = TimerResponse.create(snapshot, timeUnit);
+								metricResponse.addTimer(timerResponse);
+							}
 						}
 					} else {
 						List<AggregatedReservoirSnapshot> snapshots = timer.getSnapshots(timeSpec.getStart(), timeSpec.getEnd(), timeSpec.getResolution());
 						for (AggregatedReservoirSnapshot snapshot : snapshots) {
-							TimerResponse timerResponse = TimerResponse.create(snapshot, timeUnit);
-							metricResponse.addTimer(timerResponse);
+							if(snapshot.size() > 0) {
+								TimerResponse timerResponse = TimerResponse.create(snapshot, timeUnit);
+								metricResponse.addTimer(timerResponse);
+							}
 						}
 					}
 				} else if (metric instanceof Counter) {
@@ -264,15 +268,19 @@ public class MonitoringRS {
 //						}
 						List<AggregatedReservoirSnapshot> snapshots = counter.getSnapshots();
 						for (AggregatedReservoirSnapshot snapshot : snapshots) {
-							CounterResponse counterResponse = CounterResponse.create(snapshot);
-							metricResponse.addCounter(counterResponse);
+							if(snapshot.size() > 0) {
+								CounterResponse counterResponse = CounterResponse.create(snapshot);
+								metricResponse.addCounter(counterResponse);
+							}
 						}
 						
 					} else {
 						List<AggregatedReservoirSnapshot> snapshots = counter.getSnapshots(timeSpec.getStart(), timeSpec.getEnd(), timeSpec.getResolution());
 						for (AggregatedReservoirSnapshot snapshot : snapshots) {
-							CounterResponse counterResponse = CounterResponse.create(snapshot);
-							metricResponse.addCounter(counterResponse);
+							if(snapshot.size() > 0) {
+								CounterResponse counterResponse = CounterResponse.create(snapshot);
+								metricResponse.addCounter(counterResponse);
+							}
 						}
 					}
 				} else if (metric instanceof Aggregate) {
@@ -285,14 +293,18 @@ public class MonitoringRS {
 //						}
 						List<AggregatedReservoirSnapshot> snapshots = aggregate.getSnapshots();
 						for (AggregatedReservoirSnapshot snapshot : snapshots) {
-							AggregateTimerResponse aggregateResponse = AggregateTimerResponse.create(snapshot, timeUnit);
-							metricResponse.addAggregate(aggregateResponse);
+							if(snapshot.size() > 0) {
+								AggregateTimerResponse aggregateResponse = AggregateTimerResponse.create(snapshot, timeUnit);
+								metricResponse.addAggregate(aggregateResponse);
+							}
 						}
 					} else {
 						List<AggregatedReservoirSnapshot> snapshots = aggregate.getSnapshots(timeSpec.getStart(), timeSpec.getEnd(), timeSpec.getResolution());
 						for (AggregatedReservoirSnapshot snapshot : snapshots) {
-							AggregateTimerResponse aggregateResponse = AggregateTimerResponse.create(snapshot, timeUnit);
-							metricResponse.addAggregate(aggregateResponse);
+							if(snapshot.size() > 0) {
+								AggregateTimerResponse aggregateResponse = AggregateTimerResponse.create(snapshot, timeUnit);
+								metricResponse.addAggregate(aggregateResponse);
+							}
 						}
 					}
 
