@@ -50,7 +50,7 @@ import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
 public class ServiceLevelStrategy extends ServiceInstanceLevelStrategy {
     
     public MonitoringContext initConnectionContextOnStatementCreation(Connection connection) {
-        MonitoringContext serviceInstanceCxt = getContextProvider().getActiveInstanceContext();
+        MonitoringContext serviceInstanceCxt = getContextProvider().getActiveContext();
         if(!serviceInstanceCxt.isUndefined()) {
             MonitoringContext serviceCxt = serviceInstanceCxt.getParentContext();
             

@@ -104,13 +104,13 @@ public class TimerTest {
 	
 	@After
 	public void after() {
-		contextProvider.disposeActiveInstanceContext();
+		contextProvider.disposeActiveContext();
 	}
 	
 	@Test
 	public void testTimer() {
 	    
-		MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+		MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
 		ManualClock clock = new ManualClock(0, 50, UnitOfTime.MILLISECONDS);
 		TestReservoirBuilder reservoirBuilder = new TestReservoirBuilder(clock, 0, 1000, 1000);
 		Timer serviceTimer = new TimerImpl(serviceCxt, reservoirBuilder.build(), clock);
@@ -128,7 +128,7 @@ public class TimerTest {
 	@Test
 	public void testTimerWithRealClock() {
 	    Clock clock = Clocks.defaultClock();
-		MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+		MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
 		TestReservoirBuilder reservoirBuilder = new TestReservoirBuilder(clock, 
 		        Util.getTimeInMinuteResolution(clock.getTime()), 60l * 1000l, 60l * 1000l);
 		Timer serviceTimer = new TimerImpl(serviceCxt, reservoirBuilder.build(), clock);
@@ -148,7 +148,7 @@ public class TimerTest {
 	public void testTimerMultiThreaded() {
 	    final ManualClock clock = new ManualClock(0, 50, UnitOfTime.MILLISECONDS);
 	    
-		MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+		MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
 		TestReservoirBuilder reservoirBuilder = new TestReservoirBuilder(clock, 0, 1000, 1000);
 		final Timer serviceTimer = new TimerImpl(serviceCxt, reservoirBuilder.build(), clock);
 		
@@ -184,11 +184,11 @@ public class TimerTest {
 	public void testIfSubContextTimerIsPropagated() {
 		initProvider(Clocks.defaultClock(), createDefaultMetricReservoirConfiguration());
 		
-		MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+		MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
 		metricFactory.sumAggregate(serviceCxt);
 		
 
-		MonitoringContext subServiceCxt = contextProvider.getActiveInstanceContext().getOrCreateContext("subsystem1");
+		MonitoringContext subServiceCxt = contextProvider.getActiveContext().getOrCreateContext("subsystem1");
 		subServiceCxt.attachContext(serviceCxt);
 		
 		Timer subServiceTimer = metricFactory.timer(subServiceCxt);
@@ -209,10 +209,10 @@ public class TimerTest {
 	public void testIfNestedSubContextTimerIsPropagated() {
 		initProvider(Clocks.defaultClock(), createDefaultMetricReservoirConfiguration());
 		
-		MonitoringContext rootCxt = contextProvider.createActiveInstanceContext("test");
+		MonitoringContext rootCxt = contextProvider.createActiveContext("test");
 		metricFactory.sumAggregate(rootCxt);
 		
-		MonitoringContext serviceCxt = contextProvider.getActiveInstanceContext().getOrCreateContext("service1");
+		MonitoringContext serviceCxt = contextProvider.getActiveContext().getOrCreateContext("service1");
 		serviceCxt.attachContext(rootCxt);
 		metricFactory.sumAggregate(serviceCxt);
 		
@@ -253,10 +253,10 @@ public class TimerTest {
 		MonitoringContext subsystemsContext = contextProvider.getNodeContext().getOrCreateContext("subsystems");
 		metricFactory.sumAggregate(subsystemsContext);
 		
-		MonitoringContext rootCxt = contextProvider.createActiveInstanceContext("test");
+		MonitoringContext rootCxt = contextProvider.createActiveContext("test");
 		metricFactory.sumAggregate(rootCxt);
 		
-		MonitoringContext serviceCxt = contextProvider.getActiveInstanceContext().getOrCreateContext("service1");
+		MonitoringContext serviceCxt = contextProvider.getActiveContext().getOrCreateContext("service1");
 		serviceCxt.attachContext(rootCxt);
 		metricFactory.sumAggregate(serviceCxt);
 		

@@ -48,8 +48,7 @@ import java.util.Arrays;
  *
  */
 public class MonitoringContextProvider {
-	private static final ThreadLocal<MonitoringContext> activeInstanceContext = new ThreadLocal<MonitoringContext>();
-	private static final ThreadLocal<MonitoringContext> activeStaticContext = new ThreadLocal<MonitoringContext>();
+	private static final ThreadLocal<MonitoringContext> activeContext = new ThreadLocal<MonitoringContext>();
 	
 	private final NonDisposableMonitoringContextNode rootContext;
 	private final NonDisposableMonitoringContextNode nodeContext;
@@ -61,61 +60,32 @@ public class MonitoringContextProvider {
 	    undefined = tree.getUndefinedNode();
 	}
 	
-	public MonitoringContext createActiveInstanceContext(MonitoringContext context) {
-		MonitoringContext mContext = getActiveInstanceContext();
+	public MonitoringContext createActiveContext(MonitoringContext context) {
+		MonitoringContext mContext = getActiveContext();
 		if (mContext != undefined) {
 			throw new IllegalStateException(format("Active monitoring context already exists: %s", Arrays.toString(mContext.getPath())));
 		}
 		
-		activeInstanceContext.set(context);
+		activeContext.set(context);
 		return context;
 	}
 	
-	public MonitoringContext createActiveStaticContext(MonitoringContext context) {
-        MonitoringContext mContext = getActiveStaticContext();
-        if (mContext != undefined) {
-            throw new IllegalStateException(format("Active monitoring context already exists: %s", Arrays.toString(mContext.getPath())));
-        }
-        
-        activeStaticContext.set(context);
-        return context;
-    }
-	
-	public MonitoringContext createActiveInstanceContext(String... path) {
-		return createActiveInstanceContext(rootContext.getOrCreateContext(path));
+	public MonitoringContext createActiveContext(String... path) {
+		return createActiveContext(rootContext.getOrCreateContext(path));
 	}
 	
-	public MonitoringContext getActiveContext(boolean instance) {
-        MonitoringContext mContext = instance ? activeInstanceContext.get() : activeStaticContext.get();
-        return (mContext != null) ? mContext : undefined;
-    }
-	
-	public MonitoringContext getActiveStaticContext() {
-        MonitoringContext mContext = activeStaticContext.get();
-        return (mContext != null) ? mContext : undefined;
-    }
-	
-	public MonitoringContext getActiveInstanceContext() {
-		MonitoringContext mContext = activeInstanceContext.get();
+	public MonitoringContext getActiveContext() {
+		MonitoringContext mContext = activeContext.get();
 		return (mContext != null) ? mContext : undefined;
 	}
 	
-	public void disposeActiveInstanceContext() {
-		MonitoringContext activeInstanceContext = MonitoringContextProvider.activeInstanceContext.get();
+	public void disposeActiveContext() {
+		MonitoringContext activeInstanceContext = MonitoringContextProvider.activeContext.get();
 		if(activeInstanceContext != null) {
 			activeInstanceContext.dispose();
 		}
-		MonitoringContextProvider.activeInstanceContext.remove();
+		MonitoringContextProvider.activeContext.remove();
 	}
-	
-	public void freeActiveStaticContext() {
-        MonitoringContextProvider.activeStaticContext.remove();
-    }
-	
-	public void disposeAndFreeAllActiveContext() {
-       disposeActiveInstanceContext();
-       freeActiveStaticContext();
-    }
 	
 	public MonitoringContext getNodeContext() {
 		return nodeContext;

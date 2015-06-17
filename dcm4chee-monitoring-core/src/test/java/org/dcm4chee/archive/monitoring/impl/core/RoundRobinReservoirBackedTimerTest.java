@@ -100,13 +100,13 @@ public class RoundRobinReservoirBackedTimerTest {
 	
 	@After
 	public void after() {
-		contextProvider.disposeActiveInstanceContext();
+		contextProvider.disposeActiveContext();
 	}
 	
 	@Test
 	public void testTimer() {
 		AggregatedReservoir reservoir = reservoirFactory.createTimerReservoirContainer(Timer.TYPE.DEFAULT);
-		MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+		MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
 		TimerImpl serviceTimer = new TimerImpl(serviceCxt, reservoir, clock);
 		
 		long NR_OF_MEASUREMENTS = 5;
@@ -131,7 +131,7 @@ public class RoundRobinReservoirBackedTimerTest {
 	@Test
 	public void testTimer2() {
 		AggregatedReservoir reservoir = reservoirFactory.createTimerReservoirContainer(Timer.TYPE.DEFAULT);
-		MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+		MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
 		TimerImpl serviceTimer = new TimerImpl(serviceCxt, reservoir, clock);
 		
 		long NR_OF_MEASUREMENTS = 5;

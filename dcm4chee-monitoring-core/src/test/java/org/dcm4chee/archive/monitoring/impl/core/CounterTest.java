@@ -107,12 +107,12 @@ public class CounterTest {
 	
 	@After
 	public void after() {
-		contextProvider.disposeActiveInstanceContext();
+		contextProvider.disposeActiveContext();
 	}
 	
 	@Test
 	public void testOneShotCounterIncrease() {
-		MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+		MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
 		Counter serviceCounter = metricFactory.counter(serviceCxt, Counter.TYPE.ONE_SHOT);
 		serviceCounter.inc();
 		serviceCounter.inc();
@@ -126,7 +126,7 @@ public class CounterTest {
 	
 	@Test
     public void testDefaultCounterIncrease() {
-        MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+        MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
         Counter serviceCounter = metricFactory.counter(serviceCxt, Counter.TYPE.DEFAULT);
         serviceCounter.inc();
         serviceCounter.inc();
@@ -140,7 +140,7 @@ public class CounterTest {
 	
 	@Test
     public void testDefaultCounterSnapshot() {
-        MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+        MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
         Counter serviceCounter = metricFactory.counter(serviceCxt, Counter.TYPE.DEFAULT);
         serviceCounter.inc();
         serviceCounter.inc();

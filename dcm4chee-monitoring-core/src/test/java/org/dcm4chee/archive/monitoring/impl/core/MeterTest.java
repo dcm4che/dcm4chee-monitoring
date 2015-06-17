@@ -70,12 +70,12 @@ public class MeterTest {
     
     @After
     public void after() {
-        contextProvider.disposeActiveInstanceContext();
+        contextProvider.disposeActiveContext();
     }
     
     @Test
     public void testOpenResolutionMeter() {
-        MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+        MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
         Meter meter = metricFactory.meter(serviceCxt, TYPE.OPEN_RESOLUTION);
         meter.mark();
         
@@ -97,7 +97,7 @@ public class MeterTest {
     
     @Test
     public void test1SecResolutionMeter() {
-        MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+        MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
         Meter meter = metricFactory.meter(serviceCxt, TYPE.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
         meter.mark(5);
         
@@ -120,7 +120,7 @@ public class MeterTest {
     
     @Test
     public void test1SecResolutionMeter2() {
-        MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+        MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
         Meter meter = metricFactory.meter(serviceCxt, TYPE.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
         meter.mark(5);
         
@@ -147,7 +147,7 @@ public class MeterTest {
     
     @Test
     public void test1SecResolutionMeter3() {
-        MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+        MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
         Meter meter = metricFactory.meter(serviceCxt, TYPE.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
         
         //time: 0sec

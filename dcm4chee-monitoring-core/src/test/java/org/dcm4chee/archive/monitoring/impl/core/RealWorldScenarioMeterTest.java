@@ -92,12 +92,12 @@ public class RealWorldScenarioMeterTest {
     
     @After
     public void after() {
-        contextProvider.disposeActiveInstanceContext();
+        contextProvider.disposeActiveContext();
     }
     
 //    @Test
     public void test1SecResolutionMeter() {
-        MonitoringContext serviceCxt = contextProvider.createActiveInstanceContext("test", "service1");
+        MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
         final Meter meter = metricFactory.meter(serviceCxt, TYPE.ONE_SEC_RESOLUTION__5_SEC_HISTORY);
         
         TimerTask task = new TimerTask() {

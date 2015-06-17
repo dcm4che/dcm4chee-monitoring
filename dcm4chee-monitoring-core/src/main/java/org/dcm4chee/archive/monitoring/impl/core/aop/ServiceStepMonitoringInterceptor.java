@@ -104,7 +104,7 @@ public class ServiceStepMonitoringInterceptor implements MonitoringInterceptor {
             SERVICE_MONITORING_LEVEL level = monitorAnnotation.level();
             String[] stepName = monitorAnnotation.name();
             
-            MonitoringContext serviceInstanceCxt = cxtProvider.getActiveInstanceContext();
+            MonitoringContext serviceInstanceCxt = cxtProvider.getActiveContext();
             MonitoringContext serviceCxt = serviceInstanceCxt.getParentContext();
             
             

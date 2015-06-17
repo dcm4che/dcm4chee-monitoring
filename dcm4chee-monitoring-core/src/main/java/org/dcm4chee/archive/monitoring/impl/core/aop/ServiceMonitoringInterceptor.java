@@ -125,7 +125,7 @@ public class ServiceMonitoringInterceptor implements MonitoringInterceptor {
             // make sure service aggregate is created
             metricProvider.getMetricFactory().simpleAggregate(serviceCxt);
             
-            MonitoringContext instanceCxt = cxtProvider.createActiveInstanceContext(getServiceInstanceMonitoringContextPath(serviceCxt));
+            MonitoringContext instanceCxt = cxtProvider.createActiveContext(getServiceInstanceMonitoringContextPath(serviceCxt));
             
             Timer timer;
             switch(level) {
@@ -152,7 +152,7 @@ public class ServiceMonitoringInterceptor implements MonitoringInterceptor {
                 split.stop();
 
                 // make sure service monitoring context gets disposed
-                cxtProvider.disposeAndFreeAllActiveContext();
+                cxtProvider.disposeActiveContext();
             }
         } else {
             return context.proceed();
