@@ -252,6 +252,40 @@ public class MonitoringRSTest {
 //		Assert.assertEquals(2, snapshot.size());
 	}
 	
+	@Test
+	public void testClearingOfMetrics() {
+		MonitoringContext cxt = metricProvider.getMonitoringContextProvider().getNodeContext().getOrCreateContext("service1");
+		
+		time(cxt.getOrCreateContext("timer"), 1);
+		time(cxt.getOrCreateContext("timer"), 3);
+		
+		MonitoringContext cxt2 = metricProvider.getMonitoringContextProvider().getUndefinedContext().getOrCreateContext("service2");
+		time(cxt2.getOrCreateContext("timer"), 1);
+		time(cxt2.getOrCreateContext("timer"), 3);
+		
+		MetricResponses metricList = monitoringRS.getMetricsInt(null, null, TimeSpec.ALL, 
+				org.dcm4chee.archive.monitoring.impl.util.UnitOfTime.NANOSECONDS, false);
+		
+		Assert.assertEquals(2, metricList.getTimerResponses().size());
+		
+		monitoringRS.clear();
+		
+		metricList = monitoringRS.getMetricsInt(null, null, TimeSpec.ALL, 
+				org.dcm4chee.archive.monitoring.impl.util.UnitOfTime.NANOSECONDS, false);
+		
+		Assert.assertEquals(0, metricList.getTimerResponses().size());
+		
+		MonitoringContext cxt3 = metricProvider.getMonitoringContextProvider().getUndefinedContext().getOrCreateContext("service3");
+		time(cxt3.getOrCreateContext("timer"), 1);
+		time(cxt3.getOrCreateContext("timer"), 3);
+		
+		metricList = monitoringRS.getMetricsInt(null, null, TimeSpec.ALL, 
+				org.dcm4chee.archive.monitoring.impl.util.UnitOfTime.NANOSECONDS, false);
+		
+		Assert.assertEquals(1, metricList.getTimerResponses().size());
+		
+	}
+	
 	private void time(MonitoringContext timerCxt, long ticks) {
 		Timer timer = metricProvider.getMetricFactory().timer(timerCxt);
 		Timer.Split split = timer.time();

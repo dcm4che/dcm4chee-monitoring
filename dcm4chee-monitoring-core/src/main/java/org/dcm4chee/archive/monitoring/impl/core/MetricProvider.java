@@ -113,7 +113,7 @@ public class MetricProvider implements NodeEnabledProvider {
 	
 	public void init() {
 		metricRegistry = new MonitoringContextTree(clock, this, globalEnabled);
-		metricFactory = new MetricFactory(metricRegistry, clock, reservoirFactory);
+		metricFactory = new MetricFactory(metricRegistry.getMonitoringContextProvider(), metricRegistry, clock, reservoirFactory);
 	}
 	
 	public void setGlobalEnable(boolean globalEnable) {

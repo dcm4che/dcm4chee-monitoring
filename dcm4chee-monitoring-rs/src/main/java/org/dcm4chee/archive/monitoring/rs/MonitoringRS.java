@@ -102,6 +102,24 @@ public class MonitoringRS {
 		//NOOP
 	}
 	
+	/**
+	 * Clears (disposes) all metrics below the node context and the undefined context.
+	 */
+	@GET
+    @Path("/clear")
+    public void clear() {
+		MonitoringContext nodeContext = metricProvider.getMonitoringContextProvider().getNodeContext();
+		for(MonitoringContext child : nodeContext.getChildren(true)) {
+			child.dispose(true);
+		}
+		MonitoringContext undefinedContext = metricProvider.getMonitoringContextProvider().getUndefinedContext();
+		for(MonitoringContext child : undefinedContext.getChildren(true)) {
+			child.dispose(true);
+		}
+		
+		metricProvider.getMetricFactory().recreateRegisteredStartupMetrics();
+	}
+	
 	@GET
     @Path("/metric")
     @Produces({"application/xml"})

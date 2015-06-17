@@ -75,7 +75,7 @@ public class ForwardOnlyTimer extends AbstractMetric implements Timer {
         }
         
         protected void updateAtStop(long duration, long now) {
-            if (duration >= 0) {
+            if (duration >= 0 && reservoir != null) {
                 reservoir.update(context, now, duration);
             }
         }

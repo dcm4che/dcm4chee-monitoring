@@ -61,9 +61,9 @@ public interface MonitoringContext {
 
     MonitoringContext getOrCreateContext(String... path);
 
-    MonitoringContextNode getOrCreateContext(String[] path, String... suffix);
+    MonitoringContext getOrCreateContext(String[] path, String... suffix);
 
-    MonitoringContextNode getContext(String... path);
+    MonitoringContext getContext(String... path);
 
     MonitoringContext getOrCreateInstanceContext(Object obj, String... path);
 

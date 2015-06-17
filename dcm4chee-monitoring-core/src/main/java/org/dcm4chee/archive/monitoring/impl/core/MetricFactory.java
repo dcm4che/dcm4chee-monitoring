@@ -39,7 +39,10 @@
 
 package org.dcm4chee.archive.monitoring.impl.core;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.dcm4chee.archive.monitoring.impl.core.Meter.TYPE;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.Aggregate;
@@ -48,6 +51,7 @@ import org.dcm4chee.archive.monitoring.impl.core.aggregate.SimpleAggregate;
 import org.dcm4chee.archive.monitoring.impl.core.aggregate.SumAggregate;
 import org.dcm4chee.archive.monitoring.impl.core.clocks.Clock;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContext;
+import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContextProvider;
 import org.dcm4chee.archive.monitoring.impl.core.context.MonitoringContextTree;
 import org.dcm4chee.archive.monitoring.impl.core.metric.NoCounter;
 import org.dcm4chee.archive.monitoring.impl.core.metric.NoMeter;
@@ -56,6 +60,8 @@ import org.dcm4chee.archive.monitoring.impl.core.metric.NoTimer;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.ForwardingReservoir;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.Reservoir;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.ReservoirBuilderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -64,11 +70,16 @@ import org.dcm4chee.archive.monitoring.impl.core.reservoir.ReservoirBuilderFacto
  *
  */
 public class MetricFactory {
+	private static final Logger LOGGER = LoggerFactory.getLogger(MetricFactory.class);
+	
+	private final Map<String[],String> startupMetricsMap = new HashMap<>();
 	private final MonitoringContextTree metricRegistry;
+	private final MonitoringContextProvider cxtProvider;
 	private final Clock clock;
 	private final ReservoirBuilderFactory reservoirFactory;
 	
-	public MetricFactory(MonitoringContextTree metricRegistry, Clock clock, ReservoirBuilderFactory reservoirFactory) {
+	public MetricFactory(MonitoringContextProvider cxtProvider, MonitoringContextTree metricRegistry, Clock clock, ReservoirBuilderFactory reservoirFactory) {
+		this.cxtProvider = cxtProvider;
 		this.metricRegistry = metricRegistry;
 		this.clock = clock;
 		this.reservoirFactory = reservoirFactory;
@@ -109,6 +120,30 @@ public class MetricFactory {
             forwarding = addAttachedContexts(cxt, forwarding);
             return createAggregateInt(forwarding, cxt, "FORWARDING");
         }
+	}
+	
+	public void createAndRegisterStartupMetric(MonitoringContext cxt, String type) {
+		if(createStartupMetric(cxt, type)) {
+			startupMetricsMap.put(cxt.getPath(), type);
+		}
+	}
+	
+	private boolean createStartupMetric(MonitoringContext cxt, String type) {
+		if( !type.equals("SumAggregate")) {
+			LOGGER.error("Unknown metric type {}", type);
+			return false;
+		} else {
+			sumAggregate(cxt);
+			LOGGER.info("Created startup metric {} {}", type, cxt);
+			return true;
+		}
+	}
+	
+	public void recreateRegisteredStartupMetrics() {
+		for(Entry<String[],String> e : startupMetricsMap.entrySet()) {
+			MonitoringContext cxt = cxtProvider.getNodeContext().getOrCreateContext(e.getKey());
+			createStartupMetric(cxt, e.getValue());
+		}
 	}
 	
 	public Aggregate sumAggregate(MonitoringContext monitoringContext) {

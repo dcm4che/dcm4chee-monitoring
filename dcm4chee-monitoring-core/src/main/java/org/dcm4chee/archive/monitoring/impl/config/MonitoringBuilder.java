@@ -120,15 +120,8 @@ public class MonitoringBuilder {
                 MonitoringContext metricCxt = contextProvider.getNodeContext()
                         .getOrCreateContext(metricCfg.getContextPath());
                 String metricType = metricCfg.getType();
-                switch (metricType) {
-                case "SumAggregate":
-                    metricFactory.sumAggregate(metricCxt);
-                    LOGGER.info("Created startup metric {} {}", metricType, metricCxt);
-                    break;
-                default:
-                    LOGGER.error("Unknown metric type {}", metricType);
-                    break;
-                }
+                
+                metricFactory.createAndRegisterStartupMetric(metricCxt, metricType);
             }
         }
     }

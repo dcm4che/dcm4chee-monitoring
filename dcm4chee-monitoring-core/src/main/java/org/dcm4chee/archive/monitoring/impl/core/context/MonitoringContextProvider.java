@@ -121,6 +121,10 @@ public class MonitoringContextProvider {
 		return nodeContext;
 	}
 	
+	public MonitoringContext getUndefinedContext() {
+		return undefined;
+	}
+	
 	public MonitoringContext getRootContext() {
 		return rootContext;
 	}
