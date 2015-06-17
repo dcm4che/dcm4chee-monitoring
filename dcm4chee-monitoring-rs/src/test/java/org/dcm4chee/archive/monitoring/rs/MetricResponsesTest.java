@@ -113,8 +113,8 @@ public class MetricResponsesTest {
             "<counters>" +
             "<counter>" +
                 "<path>test.counter1</path>" +
-                "<start>1970-01-01 01:00:00.050</start>" +
-                "<end>1970-01-01 01:00:00.050</end>" +
+                "<start>1970-01-01 01:00:00.000</start>" +
+                "<end>1970-01-01 01:01:00.000</end>" +
                 "<attributes/>" +
                 "<firstUsageTimestamp>1970-01-01 01:00:00.050</firstUsageTimestamp>" +
                 "<lastUsageTimestamp>1970-01-01 01:00:00.050</lastUsageTimestamp>" +
@@ -126,8 +126,8 @@ public class MetricResponsesTest {
             "</counter>" +
             "<counter>" +
             	"<path>test.counter2</path>" +
-            	"<start>1970-01-01 01:00:00.100</start>" +
-                "<end>1970-01-01 01:00:00.100</end>" +
+            	"<start>1970-01-01 01:00:00.000</start>" +
+                "<end>1970-01-01 01:01:00.000</end>" +
             	"<attributes/>" +
             	"<firstUsageTimestamp>1970-01-01 01:00:00.100</firstUsageTimestamp>" +
             	"<lastUsageTimestamp>1970-01-01 01:00:00.100</lastUsageTimestamp>" +
@@ -206,8 +206,8 @@ public class MetricResponsesTest {
         			  "\"size\":3," +
         			  "\"counters\":[{" +
         			    "\"path\":\"\"," +
-        			    "\"start\":\"1970-01-01 01:00:00.050\"," +
-        			    "\"end\":\"1970-01-01 01:00:00.050\"," +
+        			    "\"start\":\"1970-01-01 01:00:00.000\"," +
+        			    "\"end\":\"1970-01-01 01:01:00.000\"," +
         			    "\"attributes\":{}," +
         			    "\"firstUsageTimestamp\":\"1970-01-01 01:00:00.050\"," +
         			    "\"lastUsageTimestamp\":\"1970-01-01 01:00:00.050\"," +
@@ -218,8 +218,8 @@ public class MetricResponsesTest {
         			    "\"count\":\"1\"" +
         			  "},{" +
         			    "\"path\":\"\"," +
-        			    "\"start\":\"1970-01-01 01:00:00.100\"," +
-        			    "\"end\":\"1970-01-01 01:00:00.100\"," +
+        			    "\"start\":\"1970-01-01 01:00:00.000\"," +
+        			    "\"end\":\"1970-01-01 01:01:00.000\"," +
         			    "\"attributes\":{}," +
         			    "\"firstUsageTimestamp\":\"1970-01-01 01:00:00.100\"," +
         			    "\"lastUsageTimestamp\":\"1970-01-01 01:00:00.100\"," +
