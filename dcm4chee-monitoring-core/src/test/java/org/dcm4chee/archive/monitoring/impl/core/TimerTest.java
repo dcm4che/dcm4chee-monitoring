@@ -86,7 +86,7 @@ public class TimerTest {
         reservoirCfg.setResolutionStepSize(60l * 1000l);
         reservoirCfg.setResolutions(new long[] { 60l * 1000l, 60l * 1000l * 2l });
         reservoirCfg.setRetentions( new int[] { 5, 10 });
-        reservoirCfg.setValueReservoirs(new boolean[] { true, false});
+        reservoirCfg.setMaxRawValues(new int[] { 10000, 0});
         reservoirCfg.setStart(START_SPECIFICATION.CURRENT_MIN);
         return reservoirCfg;
 	}
@@ -320,7 +320,7 @@ public class TimerTest {
         public AggregatedReservoir build() {
             return new RoundRobinReservoir.Builder()
             .clock(clock).start(start).step(step)
-            .addArchive(resolution, 1, true).build();
+            .addArchive(resolution, 1, 10000).build();
         }
         
     }

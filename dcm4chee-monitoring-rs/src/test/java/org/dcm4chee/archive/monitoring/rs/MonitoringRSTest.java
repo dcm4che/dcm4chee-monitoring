@@ -113,7 +113,7 @@ public class MonitoringRSTest {
         reservoirCfg.setResolutionStepSize(60l);
         reservoirCfg.setResolutions(new long[] { 60l, 60l * 2l });
         reservoirCfg.setRetentions( new int[] { 5, 10 });
-        reservoirCfg.setValueReservoirs(new boolean[] { true, false});
+        reservoirCfg.setMaxRawValues(new int[] { 10000, 0});
         reservoirCfg.setStart(START_SPECIFICATION.CURRENT_MIN);
         return reservoirCfg;
     }

@@ -59,8 +59,6 @@ import org.slf4j.LoggerFactory;
 public class RoundRobinReservoir implements AggregatedReservoir {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RoundRobinReservoir.class);
 	
-	private final static int VALUE_ARCHIVE_MAX_SIZE_DEFAULT = 10000;
-	
 	// archive containers sorted by increasing resolution
 	private final ArchiveContainer[] containers;
 	private final long step;
@@ -97,8 +95,8 @@ public class RoundRobinReservoir implements AggregatedReservoir {
             return this;
         }
 	    
-	    public Builder addArchive(long resolution, int retentions, boolean valueArchive) {
-	        archiveSpecs.add(new ArchiveSpec(resolution, retentions, valueArchive));
+	    public Builder addArchive(long resolution, int retentions, int maxRawValues) {
+	        archiveSpecs.add(new ArchiveSpec(resolution, retentions, maxRawValues));
 	        return this;
 	    }
 	    
@@ -110,12 +108,12 @@ public class RoundRobinReservoir implements AggregatedReservoir {
 	private static class ArchiveSpec {
 	    private final long resolution;
 	    private final int retentions;
-	    private final boolean valueArchive;
+	    private final int maxRawValues;
 	    
-        public ArchiveSpec(long resolution, int retentions, boolean valueArchive) {
+        public ArchiveSpec(long resolution, int retentions, int maxRawValues) {
             this.resolution = resolution;
             this.retentions = retentions;
-            this.valueArchive = valueArchive;
+            this.maxRawValues = maxRawValues;
         }
         
         public long getResolution() {
@@ -126,8 +124,8 @@ public class RoundRobinReservoir implements AggregatedReservoir {
             return retentions;
         }
         
-        public boolean isValueArchive() {
-            return valueArchive;
+        public int getMaxRawValues() {
+            return maxRawValues;
         }
 	    
 	}
@@ -151,7 +149,8 @@ public class RoundRobinReservoir implements AggregatedReservoir {
             }
             
             long end = builder.start + resolution;
-            Archive firstArchive = archiveSpec.isValueArchive() ? new ValueArchive(builder.start, end, resolution, VALUE_ARCHIVE_MAX_SIZE_DEFAULT) : 
+            int maxRawValues = archiveSpec.getMaxRawValues();
+            Archive firstArchive = (maxRawValues > 0) ? new ValueArchive(builder.start, end, resolution, maxRawValues) : 
                 new Archive(builder.start, end, resolution);
             ArchiveContainer container = new ArchiveContainer(resolution, archiveSpec.getRetentions(), firstArchive);
             containers[i] = container;
@@ -443,10 +442,10 @@ public class RoundRobinReservoir implements AggregatedReservoir {
 	    @Override
 	    protected void update(long now, long value) {
 	        super.update(now, value);
-	        if( size() > maxSize ) {
-	            LOGGER.error("Archive exceeds allowed maximum of values: {}", maxSize);
-	            values = null;
-	        }
+			if (values != null && size() > maxSize) {
+				LOGGER.error("Archive exceeds allowed maximum of values: {}", maxSize);
+				values = null;
+			}
 	        
 	        if(values != null) {
 	            values.add(value);

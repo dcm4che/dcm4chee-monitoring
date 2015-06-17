@@ -58,7 +58,7 @@ public interface ReservoirBuilder {
     
     ReservoirBuilder resolutions(long[] resolutions);
     
-    ReservoirBuilder valueReservoirs(boolean[] valueReservoirs);
+    ReservoirBuilder maxRawValues(int[] valueReservoirs);
     
     ReservoirBuilder retentions(int[] retentions);
     

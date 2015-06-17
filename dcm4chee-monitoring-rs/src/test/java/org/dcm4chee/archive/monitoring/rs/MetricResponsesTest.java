@@ -267,7 +267,7 @@ public class MetricResponsesTest {
         public AggregatedReservoir build() {
             return new RoundRobinReservoir.Builder()
             .clock(clock).start(start).step(step)
-            .addArchive(resolution, 1, true).build();
+            .addArchive(resolution, 1, 10000).build();
         }
         
     }

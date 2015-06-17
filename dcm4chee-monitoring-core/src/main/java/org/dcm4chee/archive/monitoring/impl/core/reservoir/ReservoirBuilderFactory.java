@@ -81,7 +81,7 @@ public class ReservoirBuilderFactory {
                     .clock(clock)
                     .resolutionStepSize(reservoirCfg.getResolutionStepSize())
                     .resolutions(reservoirCfg.getResolutions())
-                    .valueReservoirs(reservoirCfg.getValueReservoirs())
+                    .maxRawValues(reservoirCfg.getMaxRawValues())
                     .retentions(reservoirCfg.getRetentions())
                     .start(reservoirCfg.getStart());
                 break;
@@ -186,7 +186,7 @@ public class ReservoirBuilderFactory {
         }
 
         @Override
-        public ReservoirBuilder valueReservoirs(boolean[] valueReservoirs) {
+        public ReservoirBuilder maxRawValues(int[] maxRawValues) {
             return this;
         }
 
@@ -210,7 +210,7 @@ public class ReservoirBuilderFactory {
 	private static class DefaultReservoirBuilderImpl implements ReservoirBuilder {
         private long reservoirResolutionStepSize;
         private long[] reservoirResolutions;
-        private boolean[] valueReservoirs;
+        private int[] maxRawValues;
         private int[] reservoirRetentions;
         private Clock clock;
         private START_SPECIFICATION start;
@@ -226,7 +226,7 @@ public class ReservoirBuilderFactory {
                     .step(reservoirResolutionStepSize);
         
             for(int i = 0; i < reservoirResolutions.length; i++) {
-                reservoirBuilder.addArchive(reservoirResolutions[i], reservoirRetentions[i], valueReservoirs[i]);
+                reservoirBuilder.addArchive(reservoirResolutions[i], reservoirRetentions[i], maxRawValues[i]);
             }
             
             return reservoirBuilder.build();
@@ -251,8 +251,8 @@ public class ReservoirBuilderFactory {
         }
 
         @Override
-        public ReservoirBuilder valueReservoirs(boolean[] valueReservoirs) {
-            this.valueReservoirs = valueReservoirs;
+        public ReservoirBuilder maxRawValues(int[] maxRawValues) {
+            this.maxRawValues = maxRawValues;
             return this;
         }
 

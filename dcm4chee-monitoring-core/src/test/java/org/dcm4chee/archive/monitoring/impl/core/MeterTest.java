@@ -45,7 +45,7 @@ public class MeterTest {
         reservoirCfg.setResolutionStepSize(1000);
         reservoirCfg.setResolutions(new long[] { 1000 });
         reservoirCfg.setRetentions( new int[] { 5});
-        reservoirCfg.setValueReservoirs(new boolean[] { false});
+        reservoirCfg.setMaxRawValues(new int[] { 0 });
         reservoirCfg.setStart(START_SPECIFICATION.CURRENT_SEC);
         return reservoirCfg;
     }

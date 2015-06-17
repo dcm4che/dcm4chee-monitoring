@@ -55,7 +55,7 @@ public class MetricReservoirConfiguration {
     private RESERVOIR_TYPE type;
     private long resolutionStepSize;
     private long[] resolutions;
-    private boolean[] valueReservoirs;
+    private int[] maxRawValues;
     private int[] retentions;
     private START_SPECIFICATION start;
     
@@ -91,12 +91,12 @@ public class MetricReservoirConfiguration {
         this.resolutions = resolutions;
     }
     
-    public boolean[] getValueReservoirs() {
-        return valueReservoirs;
+    public int[] getMaxRawValues() {
+        return maxRawValues;
     }
 
-    public void setValueReservoirs(boolean[] valueReservoirs) {
-        this.valueReservoirs = valueReservoirs;
+    public void setMaxRawValues(int[] maxRawValues) {
+        this.maxRawValues = maxRawValues;
     }
 
     public int[] getRetentions() {

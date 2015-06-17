@@ -58,8 +58,8 @@ public class RoundRobinReservoirTest {
 		ManualClock2 clock = new ManualClock2.Builder().tick(0, 1).tock(0, 1).build();
 		RoundRobinReservoir reservoir = new RoundRobinReservoir.Builder()
 		        .clock(clock).start(0).step(5)
-		        .addArchive(5, 5, false)
-		        .addArchive(10, 5, false).build();
+		        .addArchive(5, 5, 0)
+		        .addArchive(10, 5, 0).build();
 		
 		reservoir.update(null, clock.tock(), 1);
 		reservoir.update(null, clock.tock(), 2);
@@ -88,8 +88,8 @@ public class RoundRobinReservoirTest {
 	    ManualClock2 clock = new ManualClock2.Builder().tick(0, 1).tock(0, 1).build();
 		RoundRobinReservoir reservoir = new RoundRobinReservoir.Builder()
 		        .clock(clock).start(0).step(5)
-                .addArchive(5, 5, false)
-                .addArchive(10, 5, false).build();
+                .addArchive(5, 5, 0)
+                .addArchive(10, 5, 0).build();
 		
 		reservoir.update(null, clock.tock(), 1);
 		reservoir.update(null, clock.tock(), 2);
@@ -118,8 +118,8 @@ public class RoundRobinReservoirTest {
 		ManualClock2 clock = new ManualClock2.Builder().tick(0, 1).tock(0, 1).build();
 		RoundRobinReservoir reservoir = new RoundRobinReservoir.Builder()
 		        .clock(clock).start(0).step(5)
-                .addArchive(5, 5, false)
-                .addArchive(10, 5, false).build();
+                .addArchive(5, 5, 0)
+                .addArchive(10, 5, 0).build();
 		
 		reservoir.update(null, clock.tock(), 1);
 		reservoir.update(null, clock.tock(), 2);
@@ -159,8 +159,8 @@ public class RoundRobinReservoirTest {
 	    ManualClock2 clock = new ManualClock2.Builder().tick(0, 1).tock(0, 1).build();
 		RoundRobinReservoir reservoir = new RoundRobinReservoir.Builder()
 		        .clock(clock).start(0).step(5)
-                .addArchive(5, 5, false)
-                .addArchive(10, 5, false).build();
+                .addArchive(5, 5, 0)
+                .addArchive(10, 5, 0).build();
 		
 		reservoir.update(null, clock.tock(), 1);
 		reservoir.update(null, clock.tock(), 2);
@@ -198,8 +198,8 @@ public class RoundRobinReservoirTest {
 		
 		RoundRobinReservoir reservoir = new RoundRobinReservoir.Builder()
 		        .clock(clock).start(0).step(5)
-                .addArchive(5, 5, false)
-                .addArchive(10, 5, false).build();
+                .addArchive(5, 5, 0)
+                .addArchive(10, 5, 0).build();
 		
 		reservoir.update(null, clock.tock(), 1); // time: 1
 		reservoir.update(null, clock.tock(), 2); // time: 2
@@ -225,7 +225,7 @@ public class RoundRobinReservoirTest {
 	    ManualClock2 clock = new ManualClock2.Builder().tick(0, 1).tock(0, 1).build();
         RoundRobinReservoir reservoir = new RoundRobinReservoir.Builder()
                 .clock(clock).start(0).step(5)
-                .addArchive(5, 4, false).build();
+                .addArchive(5, 4, 0).build();
         
         reservoir.update(null, clock.tock(), 1); //time: 1
         reservoir.update(null, clock.tock(), 2); //time: 2
@@ -251,7 +251,7 @@ public class RoundRobinReservoirTest {
         ManualClock2 clock = new ManualClock2.Builder().tick(0, 1).tock(0, 1).build();
         RoundRobinReservoir reservoir = new RoundRobinReservoir.Builder()
                 .clock(clock).start(0).step(5)
-                .addArchive(5, 1, false).build();
+                .addArchive(5, 1, 0).build();
         
         reservoir.update(null, clock.tock(), 1); //time: 1
         reservoir.update(null, clock.tock(), 2); //time: 2
@@ -276,7 +276,7 @@ public class RoundRobinReservoirTest {
         ManualClock2 clock = new ManualClock2.Builder().tick(0, 1).tock(0, 1).build();
         RoundRobinReservoir reservoir = new RoundRobinReservoir.Builder()
                 .clock(clock).start(0).step(5)
-                .addArchive(5, 4, false).build();
+                .addArchive(5, 4, 0).build();
         
         reservoir.update(null, clock.tock(), 1); //time: 1
         reservoir.update(null, clock.tock(), 2); //time: 2
@@ -293,8 +293,8 @@ public class RoundRobinReservoirTest {
 	    ManualClock2 clock = new ManualClock2.Builder().tick(0, 1).tock(0, 1).build();
         RoundRobinReservoir reservoir = new RoundRobinReservoir.Builder()
                 .clock(clock).start(0).step(5)
-                .addArchive(5, 5, true)
-                .addArchive(10, 5, false).build();
+                .addArchive(5, 5, 10000)
+                .addArchive(10, 5, 0).build();
         
         reservoir.update(null, clock.tock(), 1);
         reservoir.update(null, clock.tock(), 2);
