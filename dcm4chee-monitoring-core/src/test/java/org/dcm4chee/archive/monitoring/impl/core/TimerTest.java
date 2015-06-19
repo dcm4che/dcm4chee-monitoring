@@ -126,25 +126,6 @@ public class TimerTest {
 	}
 	
 	@Test
-	public void testTimerWithRealClock() {
-	    Clock clock = Clocks.defaultClock();
-		MonitoringContext serviceCxt = contextProvider.createActiveContext("test", "service1");
-		TestReservoirBuilder reservoirBuilder = new TestReservoirBuilder(clock, 
-		        Util.getTimeInMinuteResolution(clock.getTime()), 60l * 1000l, 60l * 1000l);
-		Timer serviceTimer = new TimerImpl(serviceCxt, reservoirBuilder.build(), clock);
-		Timer.Split split = serviceTimer.time();
-		try {
-			randomDurationMethod(2, 5);
-		} finally {
-			split.stop();
-		}
-		
-		AggregatedReservoirSnapshot snapshot = serviceTimer.getSnapshot();
-		Assert.assertTrue(snapshot.getMax() > 1000000);
-		Assert.assertTrue(snapshot.getMax() < 8000000);
-	}
-	
-	@Test
 	public void testTimerMultiThreaded() {
 	    final ManualClock clock = new ManualClock(0, 50, UnitOfTime.MILLISECONDS);
 	    
