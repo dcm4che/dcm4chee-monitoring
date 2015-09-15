@@ -133,21 +133,9 @@ public class TimerTest {
 		TestReservoirBuilder reservoirBuilder = new TestReservoirBuilder(clock, 0, 1000, 1000);
 		final Timer serviceTimer = new TimerImpl(serviceCxt, reservoirBuilder.build(), clock);
 		
-		Runnable runnable = new Runnable() {
-			public void run() {
-				Timer.Split split = serviceTimer.time();
-				try {
-					clock.tick();
-				} finally {
-					split.stop();
-				}
-				
-				AggregatedReservoirSnapshot snapshot = serviceTimer.getSnapshot();
-				Assert.assertEquals(50000000, snapshot.getMax());
-			}
-		};
-		
-		new Thread(runnable).start();
+		TimerClient timerClient = new TimerClient(clock, serviceTimer);
+		Thread t = new Thread(timerClient);
+		t.start();
 		
 		Timer.Split split = serviceTimer.time();
 		try {
@@ -159,6 +147,41 @@ public class TimerTest {
 		AggregatedReservoirSnapshot snapshot = serviceTimer.getSnapshot();
 		Assert.assertEquals(50000000, snapshot.getMax());
 		
+		try {
+            t.join();
+        } catch (InterruptedException e) {
+            // does not happen
+        }
+		
+        AggregatedReservoirSnapshot snapshot2 = timerClient.getSnapshot();
+        Assert.assertEquals(50000000, snapshot2.getMax());
+	}
+	
+	private static class TimerClient implements Runnable {
+	    private final Timer serviceTimer;
+	    private final ManualClock clock;
+	    private AggregatedReservoirSnapshot snapshot;
+	    
+	    private TimerClient(ManualClock clock, Timer serviceTimer) {
+	        this.serviceTimer = serviceTimer;
+	        this.clock = clock;
+	    }
+	    
+	    public void run() {
+            Timer.Split split = serviceTimer.time();
+            try {
+                clock.tick();
+            } finally {
+                split.stop();
+            }
+            
+            snapshot = serviceTimer.getSnapshot();
+        }
+	    
+	    private AggregatedReservoirSnapshot getSnapshot() {
+	        return snapshot;
+	    }
+	    
 	}
 	
 	@Test
