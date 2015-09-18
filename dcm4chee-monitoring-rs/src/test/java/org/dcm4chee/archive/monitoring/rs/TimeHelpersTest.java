@@ -41,12 +41,6 @@ package org.dcm4chee.archive.monitoring.rs;
 
 import java.util.Date;
 
-
-
-
-
-
-
 import org.dcm4chee.archive.monitoring.impl.util.UnitOfTime;
 import org.junit.Assert;
 import org.junit.Test;
@@ -61,7 +55,6 @@ public class TimeHelpersTest {
     public void testParsingDate() {
         Date date = TimeHelpers.parseDate("2015-05-28 14:52:33");
         Assert.assertNotNull(date);
-        Assert.assertEquals(1432817553000l, date.getTime());
     }
     
     @Test
