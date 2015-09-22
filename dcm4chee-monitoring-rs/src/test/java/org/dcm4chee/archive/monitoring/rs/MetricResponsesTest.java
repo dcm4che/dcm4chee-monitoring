@@ -41,6 +41,7 @@ package org.dcm4chee.archive.monitoring.rs;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.TimeZone;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -57,7 +58,6 @@ import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoir;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.RoundRobinReservoir;
 import org.dcm4chee.archive.monitoring.impl.util.UnitOfTime;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -70,47 +70,57 @@ public class MetricResponsesTest {
 	private final ManualClock clock = new ManualClock(0, 50, UnitOfTime.MILLISECONDS);
 	
 	@Test
-	@Ignore
 	public void testMetricListXmlMarshalling() throws JAXBException {
-	    TestReservoirBuilder reservoirBuilder = new TestReservoirBuilder(clock, 0, 60 * 1000, 60 *1000);
-		JAXBContext jc = JAXBContext.newInstance(MetricResponses.class);
-		 
-        MetricResponses metricResponse = new MetricResponses();
-        
-        clock.tick();
-        
-        CounterImpl counter = new CounterImpl(new MonitoringContextTree(clock).getRoot().getOrCreateContext("test.counter1"), reservoirBuilder.build(), clock);
-        counter.inc();
-        CounterResponse counterResponse = CounterResponse.create(counter.getSnapshot());
-        metricResponse.addCounter(counterResponse);
-        
-        clock.tick();
-        
-        counter = new CounterImpl(new MonitoringContextTree(clock).getRoot().getOrCreateContext("test.counter2"), reservoirBuilder.build(), clock);
-        counter.inc(); counter.inc();
-        counterResponse = CounterResponse.create(counter.getSnapshot());
-        metricResponse.addCounter(counterResponse);
-        
-        clock.tick();
-        
-        TimerImpl timer = new TimerImpl(new MonitoringContextTree(clock).getRoot().getOrCreateContext("test.timer1"), reservoirBuilder.build(), clock);
-        try( Timer.Split cxt = timer.time()) {
-        	clock.tick();
-        } 
-        
-        TimerResponse timerResponse = TimerResponse.create(timer.getSnapshot(), UnitOfTime.MILLISECONDS);
-        metricResponse.addTimer(timerResponse);
- 
-        Marshaller marshaller = jc.createMarshaller();
- 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        marshaller.setProperty("jaxb.fragment", Boolean.TRUE);
-//        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.marshal(metricResponse, out);
+	    TimeZone origDefaultTimeZone = TimeZone.getDefault();
+	    
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone("CET"));
+
+            TestReservoirBuilder reservoirBuilder = new TestReservoirBuilder(clock, 0, 60 * 1000,
+                    60 * 1000);
+            JAXBContext jc = JAXBContext.newInstance(MetricResponses.class);
+
+            MetricResponses metricResponse = new MetricResponses();
+
+            clock.tick();
+
+            CounterImpl counter = new CounterImpl(new MonitoringContextTree(clock).getRoot()
+                    .getOrCreateContext("test.counter1"), reservoirBuilder.build(), clock);
+            counter.inc();
+            CounterResponse counterResponse = CounterResponse.create(counter.getSnapshot());
+            metricResponse.addCounter(counterResponse);
+
+            clock.tick();
+
+            counter = new CounterImpl(new MonitoringContextTree(clock).getRoot()
+                    .getOrCreateContext("test.counter2"), reservoirBuilder.build(), clock);
+            counter.inc();
+            counter.inc();
+            counterResponse = CounterResponse.create(counter.getSnapshot());
+            metricResponse.addCounter(counterResponse);
+
+            clock.tick();
+
+            TimerImpl timer = new TimerImpl(new MonitoringContextTree(clock).getRoot()
+                    .getOrCreateContext("test.timer1"), reservoirBuilder.build(), clock);
+            try (Timer.Split cxt = timer.time()) {
+                clock.tick();
+            }
+
+            TimerResponse timerResponse = TimerResponse.create(timer.getSnapshot(),
+                    UnitOfTime.MILLISECONDS);
+            metricResponse.addTimer(timerResponse);
+
+            Marshaller marshaller = jc.createMarshaller();
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            marshaller.setProperty("jaxb.fragment", Boolean.TRUE);
+            // marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.marshal(metricResponse, out);
         
 //        System.out.println(out.toString());
         
-        Assert.assertEquals(
+            Assert.assertEquals(
         	"<metrics size=\"3\">" +
             "<counters>" +
             "<counter>" +
@@ -160,49 +170,64 @@ public class MetricResponsesTest {
             "</timers>" +
             "<aggregates/>" +
             "</metrics>",
-        out.toString());
+            out.toString());
+	    } finally {
+	        TimeZone.setDefault(origDefaultTimeZone);
+	    }
 	}
 	
 	@Test
-	@Ignore
 	public void testMetricListJsonMarshalling() throws IOException {
-	    TestReservoirBuilder reservoirBuilder = new TestReservoirBuilder(clock, 0, 60 * 1000, 60 *1000);
+	    TimeZone origDefaultTimeZone = TimeZone.getDefault();
 	    
-		ObjectMapper objectMapper = new ObjectMapper();
-		 
-        MetricResponses metricResponses = new MetricResponses();
-        
-        clock.tick();
-        
-        CounterImpl counter = new CounterImpl(new MonitoringContextTree(clock).getRoot(), reservoirBuilder.build(), clock);
-        counter.inc();
-        
-        clock.tick();
-        
-        CounterResponse counterResponse = CounterResponse.create(counter.getSnapshot());
-        metricResponses.addCounter(counterResponse);
-        
-        counter = new CounterImpl(new MonitoringContextTree(clock).getRoot(), reservoirBuilder.build(), clock);
-        counter.inc(); counter.inc();
-        
-        clock.tick();
-        
-        counterResponse = CounterResponse.create(counter.getSnapshot());
-        metricResponses.addCounter(counterResponse);
-        
-        TimerImpl timer = new TimerImpl(new MonitoringContextTree(clock).getRoot(), reservoirBuilder.build(), clock);
-        try( Timer.Split cxt = timer.time()) {
+	    try {
+	        TimeZone.setDefault(TimeZone.getTimeZone("CET"));
+	        
+            TestReservoirBuilder reservoirBuilder = new TestReservoirBuilder(clock, 0, 60 * 1000,
+                    60 * 1000);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            MetricResponses metricResponses = new MetricResponses();
+
             clock.tick();
-        } 
-        
-        TimerResponse timerResponse = TimerResponse.create(timer.getSnapshot(), UnitOfTime.NANOSECONDS);
-        metricResponses.addTimer(timerResponse);
- 
-        String json = objectMapper.setSerializationInclusion(Inclusion.NON_NULL).writeValueAsString(metricResponses);
-        
-//        String json = objectMapper.setSerializationInclusion(Inclusion.NON_NULL)
-//                .writerWithDefaultPrettyPrinter().writeValueAsString(metricResponses);
-//        System.out.println(json);
+
+            CounterImpl counter = new CounterImpl(new MonitoringContextTree(clock).getRoot(),
+                    reservoirBuilder.build(), clock);
+            counter.inc();
+
+            clock.tick();
+
+            CounterResponse counterResponse = CounterResponse.create(counter.getSnapshot());
+            metricResponses.addCounter(counterResponse);
+
+            counter = new CounterImpl(new MonitoringContextTree(clock).getRoot(),
+                    reservoirBuilder.build(), clock);
+            counter.inc();
+            counter.inc();
+
+            clock.tick();
+
+            counterResponse = CounterResponse.create(counter.getSnapshot());
+            metricResponses.addCounter(counterResponse);
+
+            TimerImpl timer = new TimerImpl(new MonitoringContextTree(clock).getRoot(),
+                    reservoirBuilder.build(), clock);
+            try (Timer.Split cxt = timer.time()) {
+                clock.tick();
+            }
+
+            TimerResponse timerResponse = TimerResponse.create(timer.getSnapshot(),
+                    UnitOfTime.NANOSECONDS);
+            metricResponses.addTimer(timerResponse);
+
+            String json = objectMapper.setSerializationInclusion(Inclusion.NON_NULL)
+                    .writeValueAsString(metricResponses);
+
+            // String json =
+            // objectMapper.setSerializationInclusion(Inclusion.NON_NULL)
+            // .writerWithDefaultPrettyPrinter().writeValueAsString(metricResponses);
+            // System.out.println(json);
         
         Assert.assertEquals(
         		"{" +
@@ -251,7 +276,10 @@ public class MetricResponsesTest {
         			  "}]," +
         			  "\"aggregates\":[]" +
         			"}",
-        json);
+        			json);
+	    } finally {
+	        TimeZone.setDefault(origDefaultTimeZone);
+	    }
 	}
 	
 	private static class TestReservoirBuilder {
