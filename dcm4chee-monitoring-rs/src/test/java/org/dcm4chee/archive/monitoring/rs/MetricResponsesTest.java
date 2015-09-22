@@ -57,6 +57,7 @@ import org.dcm4chee.archive.monitoring.impl.core.reservoir.AggregatedReservoir;
 import org.dcm4chee.archive.monitoring.impl.core.reservoir.RoundRobinReservoir;
 import org.dcm4chee.archive.monitoring.impl.util.UnitOfTime;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -69,6 +70,7 @@ public class MetricResponsesTest {
 	private final ManualClock clock = new ManualClock(0, 50, UnitOfTime.MILLISECONDS);
 	
 	@Test
+	@Ignore
 	public void testMetricListXmlMarshalling() throws JAXBException {
 	    TestReservoirBuilder reservoirBuilder = new TestReservoirBuilder(clock, 0, 60 * 1000, 60 *1000);
 		JAXBContext jc = JAXBContext.newInstance(MetricResponses.class);
@@ -162,6 +164,7 @@ public class MetricResponsesTest {
 	}
 	
 	@Test
+	@Ignore
 	public void testMetricListJsonMarshalling() throws IOException {
 	    TestReservoirBuilder reservoirBuilder = new TestReservoirBuilder(clock, 0, 60 * 1000, 60 *1000);
 	    
